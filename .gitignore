@@ -12,3 +12,4 @@ dist-ssr
 .claude-flow/
 .claude/settings.local.json
 .claude/launch.json
+supabase/.temp/
