@@ -1,0 +1,120 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Fenlark Technologies brand blues: deep royal blue (the "F" mark) paired
+     with a brighter periwinkle blue (the mark's accent dot). Replaces the
+     earlier placeholder violet/magenta palette. */
+  :root {
+    --background: 222 45% 98%;
+    --foreground: 224 32% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 224 32% 12%;
+
+    --primary: 228 69% 55%;
+    --primary-foreground: 0 0% 100%;
+    --primary-strong: 228 72% 44%;
+
+    --secondary: 226 94% 67%;
+    --secondary-foreground: 0 0% 100%;
+
+    --accent: 221 83% 53%;
+    --accent-foreground: 0 0% 100%;
+
+    --muted: 222 45% 95%;
+    --muted-foreground: 220 14% 47%;
+
+    --border: 222 50% 91%;
+    --input: 222 50% 88%;
+    --ring: 228 69% 55%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 152 60% 40%;
+    --success-foreground: 0 0% 100%;
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 225 35% 7%;
+    --foreground: 222 40% 96%;
+
+    --card: 225 30% 11%;
+    --card-foreground: 222 40% 96%;
+
+    --primary: 228 78% 66%;
+    --primary-foreground: 225 35% 7%;
+    --primary-strong: 228 75% 52%;
+
+    --secondary: 226 92% 72%;
+    --secondary-foreground: 225 35% 7%;
+
+    --accent: 221 85% 65%;
+    --accent-foreground: 225 35% 7%;
+
+    --muted: 225 22% 16%;
+    --muted-foreground: 222 15% 65%;
+
+    --border: 225 22% 20%;
+    --input: 225 22% 20%;
+    --ring: 228 78% 66%;
+
+    --destructive: 0 72% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 152 55% 46%;
+    --success-foreground: 225 35% 7%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased font-sans;
+    font-feature-settings: 'cv11', 'ss01';
+  }
+
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@layer utilities {
+  .shimmer-bg {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--muted)) 0%,
+      hsl(var(--background)) 50%,
+      hsl(var(--muted)) 100%
+    );
+    background-size: 200% 100%;
+  }
+
+  .text-gradient {
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--secondary)));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .glass {
+    background: hsl(var(--card) / 0.6);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid hsl(var(--border) / 0.6);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

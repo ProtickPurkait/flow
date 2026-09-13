@@ -1,0 +1,197 @@
+import * as React from 'react'
+import { useNavigate, useParams, Link } from 'react-router-dom'
+import gsap from 'gsap'
+import { Loader2, ArrowRight, Compass } from 'lucide-react'
+import { supabase } from '@/lib/supabase'
+import { ensureCustomerSession, isRegistered, registerCustomer, joinBusiness } from '@/lib/customer'
+import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
+import { FlowLogo } from '@/components/brand/FlowLogo'
+import type { Business } from '@/types/database'
+
+type Phase = 'loading' | 'form' | 'joining' | 'not-found'
+
+export default function EntryPage() {
+  const { slug } = useParams<{ slug: string }>()
+  const navigate = useNavigate()
+  const heroRef = React.useRef<HTMLDivElement>(null)
+
+  const [phase, setPhase] = React.useState<Phase>('loading')
+  const [business, setBusiness] = React.useState<Business | null>(null)
+  const [phone, setPhone] = React.useState('')
+  const [name, setName] = React.useState('')
+  const [error, setError] = React.useState<string | null>(null)
+  const [submitting, setSubmitting] = React.useState(false)
+
+  React.useEffect(() => {
+    if (!slug) return
+    const businessSlug = slug
+
+    let cancelled = false
+
+    async function bootstrap() {
+      const { data: biz } = await supabase
+        .from('businesses')
+        .select('*')
+        .eq('slug', businessSlug)
+        .eq('status', 'active')
+        .maybeSingle()
+
+      if (cancelled) return
+      if (!biz) {
+        setPhase('not-found')
+        return
+      }
+      setBusiness(biz)
+
+      await ensureCustomerSession()
+      const registered = await isRegistered()
+
+      if (cancelled) return
+
+      if (registered) {
+        setPhase('joining')
+        try {
+          await joinBusiness(businessSlug)
+          navigate(`/business/${businessSlug}`, { replace: true })
+        } catch {
+          setPhase('form')
+        }
+      } else {
+        setPhase('form')
+      }
+    }
+
+    bootstrap()
+    return () => {
+      cancelled = true
+    }
+  }, [slug, navigate])
+
+  React.useEffect(() => {
+    if (phase === 'form' && heroRef.current) {
+      gsap.fromTo(
+        heroRef.current.children,
+        { opacity: 0, y: 16 },
+        { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out', stagger: 0.08 }
+      )
+    }
+  }, [phase])
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!slug) return
+    setError(null)
+    setSubmitting(true)
+    try {
+      await registerCustomer(phone, name)
+      await joinBusiness(slug)
+      navigate(`/business/${slug}`, { replace: true })
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong. Try again.')
+      setSubmitting(false)
+    }
+  }
+
+  if (phase === 'loading' || phase === 'joining') {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      </div>
+    )
+  }
+
+  if (phase === 'not-found') {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-background px-6 text-center">
+        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
+          <Compass className="h-6 w-6" />
+        </div>
+        <h1 className="text-xl font-bold">We couldn't find this place</h1>
+        <p className="max-w-xs text-sm text-muted-foreground">
+          This QR code may be inactive. Ask staff for a fresh one.
+        </p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex min-h-screen flex-col bg-flow-aurora px-6 pt-16">
+      <div ref={heroRef} className="mx-auto w-full max-w-sm">
+        <div className="mb-6 flex items-center gap-3">
+          {business?.logo_url && (
+            <img src={business.logo_url} alt={business.name} className="h-11 w-11 rounded-2xl object-cover shadow-sm" />
+          )}
+          <p className="text-sm font-medium text-muted-foreground">
+            Welcome to <span className="font-semibold text-foreground">{business?.name}</span>
+          </p>
+        </div>
+
+        <h1 className="mb-3 text-3xl font-bold leading-tight tracking-tight text-foreground">Start collecting stamps!</h1>
+        <p className="mb-8 text-base text-muted-foreground">
+          Enter your number and unlock rewards at {business?.name}.
+        </p>
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="phone" className="text-sm font-medium text-foreground">
+              Mobile Number
+            </Label>
+            <div className="flex h-14 items-center rounded-2xl border border-transparent bg-muted/60 transition-colors focus-within:border-primary focus-within:bg-card">
+              <span className="pl-4 pr-2 text-lg font-medium text-foreground/70">+91</span>
+              <input
+                id="phone"
+                type="tel"
+                inputMode="tel"
+                autoComplete="tel"
+                required
+                placeholder="9876543210"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="h-full flex-1 rounded-r-2xl bg-transparent pr-4 text-lg tracking-wider text-foreground outline-none placeholder:text-muted-foreground"
+              />
+            </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="name" className="text-sm font-medium text-foreground">
+              Name
+            </Label>
+            <input
+              id="name"
+              autoComplete="name"
+              required
+              placeholder="Your name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="h-14 w-full rounded-2xl border border-transparent bg-muted/60 px-4 text-lg text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:bg-card"
+            />
+          </div>
+          {error && <p className="text-sm font-medium text-destructive">{error}</p>}
+          <Button type="submit" size="lg" disabled={submitting} className="mt-1">
+            {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+            Start collecting stamps
+            {!submitting && <ArrowRight className="h-4 w-4" />}
+          </Button>
+          <p className="text-center text-xs text-muted-foreground">
+            No password, no OTP — just your number, saved on this device.
+          </p>
+
+          <div className="flex flex-col items-center gap-3 pb-4 pt-1">
+            <p className="text-center text-xs text-muted-foreground">
+              By proceeding, you agree to our{' '}
+              <Link to="/terms" className="font-medium text-foreground underline underline-offset-2">
+                Terms &amp; Conditions
+              </Link>{' '}
+              and{' '}
+              <Link to="/privacy" className="font-medium text-foreground underline underline-offset-2">
+                Privacy Policy
+              </Link>
+              .
+            </p>
+            <FlowLogo className="h-5 w-5 opacity-70" />
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
