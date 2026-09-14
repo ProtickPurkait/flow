@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useOutletContext, Link } from 'react-router-dom'
-import { ChevronLeft, Loader2, Save, Minus, Plus, Calendar, Gift, Hourglass, MessageCircle, IndianRupee } from 'lucide-react'
+import { ChevronLeft, Loader2, Save, Minus, Plus, Calendar, Gift, Hourglass, MessageCircle, IndianRupee, Cake } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useToast } from '@/hooks/use-toast'
 import { Card, CardContent } from '@/components/ui/card'
@@ -28,6 +28,8 @@ export default function StampCardPage() {
   const [welcomeTemplate, setWelcomeTemplate] = React.useState('')
   const [reminderTemplate, setReminderTemplate] = React.useState('')
   const [expiredTemplate, setExpiredTemplate] = React.useState('')
+  const [birthdayEnabled, setBirthdayEnabled] = React.useState(false)
+  const [birthdayTemplate, setBirthdayTemplate] = React.useState('')
 
   React.useEffect(() => {
     supabase
@@ -51,6 +53,8 @@ export default function StampCardPage() {
           setWelcomeTemplate(data.welcome_message_template)
           setReminderTemplate(data.deadline_reminder_template)
           setExpiredTemplate(data.card_expired_template)
+          setBirthdayEnabled(data.birthday_message_enabled)
+          setBirthdayTemplate(data.birthday_message_template)
         }
         setLoading(false)
       })
@@ -72,6 +76,8 @@ export default function StampCardPage() {
         welcome_message_template: welcomeTemplate,
         deadline_reminder_template: reminderTemplate,
         card_expired_template: expiredTemplate,
+        birthday_message_enabled: birthdayEnabled,
+        birthday_message_template: birthdayTemplate,
       })
       .eq('id', program.id)
     setSaving(false)
@@ -191,6 +197,46 @@ export default function StampCardPage() {
                   Staff will enter the order amount when approving a stamp request, so Auto Approve Scans is
                   skipped for this program while this is on -- every scan needs a human to confirm the total.
                 </span>
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="flex flex-col gap-4 p-4">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600">
+                <Cake className="h-4 w-4" />
+              </div>
+              <div>
+                <p className="font-semibold">Birthday reward</p>
+                <p className="text-xs text-muted-foreground">A bonus stamp + WhatsApp message on a customer's birthday</p>
+              </div>
+            </div>
+            <Switch checked={birthdayEnabled} onCheckedChange={setBirthdayEnabled} />
+          </div>
+
+          {birthdayEnabled && (
+            <>
+              <div className="flex items-start gap-2 rounded-xl bg-amber-500/5 p-3 text-xs text-muted-foreground">
+                <Cake className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-600" />
+                <span>
+                  Only customers who've added their birthday in their profile are included -- it's never asked for
+                  at registration.
+                </span>
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <Label className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+                  Birthday message
+                </Label>
+                <Textarea
+                  value={birthdayTemplate}
+                  onChange={(e) => setBirthdayTemplate(e.target.value)}
+                  className="min-h-[80px]"
+                />
+                <PlaceholderChips tokens={['{business_name}']} />
               </div>
             </>
           )}

@@ -47,6 +47,8 @@ export interface StampProgram {
   welcome_message_template: string
   deadline_reminder_template: string
   card_expired_template: string
+  birthday_message_enabled: boolean
+  birthday_message_template: string
   is_active: boolean
   created_at: string
 }
@@ -240,7 +242,7 @@ export interface WhatsappNotificationRow {
   id: string
   customer_name: string | null
   customer_phone: string
-  type: 'welcome' | 'deadline_reminder' | 'card_expired' | 'promo'
+  type: 'welcome' | 'deadline_reminder' | 'card_expired' | 'promo' | 'birthday'
   message_body: string
   status: 'pending' | 'sent' | 'failed' | 'skipped_not_configured'
   created_at: string
@@ -264,6 +266,7 @@ export interface CustomerProfile {
   name: string | null
   email: string | null
   referral_code: string
+  date_of_birth: string | null
 }
 
 export interface PendingScratchWinRow {
@@ -355,7 +358,10 @@ export interface Database {
       }
       list_my_cards: { Args: Record<string, never>; Returns: MyCardRow[] }
       list_my_rewards: { Args: Record<string, never>; Returns: MyRewardRow[] }
-      update_my_profile: { Args: { p_name: string | null; p_email: string | null }; Returns: CustomerProfile[] }
+      update_my_profile: {
+        Args: { p_name: string | null; p_email: string | null; p_date_of_birth?: string | null }
+        Returns: CustomerProfile[]
+      }
       get_my_profile: { Args: Record<string, never>; Returns: CustomerProfile[] }
       draw_scratch_card: { Args: { p_business_slug: string }; Returns: ScratchDrawResult[] }
       list_pending_scratch_wins: { Args: { p_business_id: string }; Returns: PendingScratchWinRow[] }

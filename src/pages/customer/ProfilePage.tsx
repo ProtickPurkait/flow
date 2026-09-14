@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Loader2, Phone, Mail, Moon, LogOut, Pencil, Check, User as UserIcon, ShieldCheck, LifeBuoy, ChevronRight } from 'lucide-react'
+import { Loader2, Phone, Mail, Cake, Moon, LogOut, Pencil, Check, User as UserIcon, ShieldCheck, LifeBuoy, ChevronRight } from 'lucide-react'
 import { useCustomerAccount } from '@/hooks/useCustomerAccount'
 import { getMyProfile, updateMyProfile, signOutCustomer } from '@/lib/customer'
 import { useDarkMode } from '@/hooks/useDarkMode'
@@ -21,6 +21,7 @@ export default function ProfilePage() {
   const [editing, setEditing] = React.useState(false)
   const [name, setName] = React.useState('')
   const [email, setEmail] = React.useState('')
+  const [dateOfBirth, setDateOfBirth] = React.useState('')
   const [saving, setSaving] = React.useState(false)
 
   React.useEffect(() => {
@@ -30,13 +31,14 @@ export default function ProfilePage() {
       setProfile(p)
       setName(p.name ?? '')
       setEmail(p.email ?? '')
+      setDateOfBirth(p.date_of_birth ?? '')
     })
   }, [registered])
 
   const handleSave = async () => {
     setSaving(true)
     try {
-      const updated = await updateMyProfile(name, email)
+      const updated = await updateMyProfile(name, email, dateOfBirth)
       if (updated) setProfile(updated)
       setEditing(false)
       toast({ title: 'Profile updated', variant: 'success' })
@@ -126,6 +128,23 @@ export default function ProfilePage() {
               ) : (
                 <p className={profile?.email ? 'font-semibold' : 'italic text-muted-foreground'}>
                   {profile?.email || 'Not set'}
+                </p>
+              )}
+            </div>
+          </div>
+          <div className="flex items-center gap-3 border-t border-border p-4">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600">
+              <Cake className="h-4.5 w-4.5" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Birthday</p>
+              {editing ? (
+                <Input type="date" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} className="mt-1 h-9" />
+              ) : (
+                <p className={profile?.date_of_birth ? 'font-semibold' : 'italic text-muted-foreground'}>
+                  {profile?.date_of_birth
+                    ? new Date(profile.date_of_birth).toLocaleDateString(undefined, { month: 'long', day: 'numeric' })
+                    : 'Add it for birthday treats from businesses you visit'}
                 </p>
               )}
             </div>

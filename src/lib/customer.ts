@@ -83,8 +83,16 @@ export async function listMyRewards(): Promise<MyRewardRow[]> {
   return data ?? []
 }
 
-export async function updateMyProfile(name: string, email: string): Promise<CustomerProfile | undefined> {
-  const { data, error } = await supabase.rpc('update_my_profile', { p_name: name, p_email: email })
+export async function updateMyProfile(
+  name: string,
+  email: string,
+  dateOfBirth?: string | null
+): Promise<CustomerProfile | undefined> {
+  const { data, error } = await supabase.rpc('update_my_profile', {
+    p_name: name,
+    p_email: email,
+    p_date_of_birth: dateOfBirth || null,
+  })
   if (error) throw error
   return data?.[0]
 }
