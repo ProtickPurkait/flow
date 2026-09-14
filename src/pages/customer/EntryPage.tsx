@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useNavigate, useParams, Link } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams, Link } from 'react-router-dom'
 import gsap from 'gsap'
 import { Loader2, ArrowRight, Compass, ScanLine, Stamp, Gift } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
@@ -13,6 +13,8 @@ type Phase = 'loading' | 'form' | 'joining' | 'not-found'
 
 export default function EntryPage() {
   const { slug } = useParams<{ slug: string }>()
+  const [searchParams] = useSearchParams()
+  const referralCode = searchParams.get('ref')
   const navigate = useNavigate()
   const heroRef = React.useRef<HTMLDivElement>(null)
 
@@ -63,7 +65,7 @@ export default function EntryPage() {
       if (registered) {
         setPhase('joining')
         try {
-          await joinBusiness(businessSlug)
+          await joinBusiness(businessSlug, referralCode)
           navigate(`/business/${businessSlug}`, { replace: true })
         } catch {
           setPhase('form')
@@ -77,7 +79,7 @@ export default function EntryPage() {
     return () => {
       cancelled = true
     }
-  }, [slug, navigate])
+  }, [slug, navigate, referralCode])
 
   React.useEffect(() => {
     if (phase === 'form' && heroRef.current) {
@@ -96,7 +98,7 @@ export default function EntryPage() {
     setSubmitting(true)
     try {
       await registerCustomer(phone, name)
-      await joinBusiness(slug)
+      await joinBusiness(slug, referralCode)
       navigate(`/business/${slug}`, { replace: true })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong. Try again.')

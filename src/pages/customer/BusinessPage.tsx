@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { useParams, Link } from 'react-router-dom'
 import gsap from 'gsap'
-import { Loader2, Stamp, Clock, Compass, Gift, Phone, MapPin, PartyPopper, UtensilsCrossed, ChevronRight, Hourglass, IndianRupee } from 'lucide-react'
+import { Loader2, Stamp, Clock, Compass, Gift, Phone, MapPin, PartyPopper, UtensilsCrossed, ChevronRight, Hourglass, IndianRupee, Users, Share2 } from 'lucide-react'
 import { useCustomerAccount } from '@/hooks/useCustomerAccount'
 import { useCustomerCard } from '@/hooks/useCustomerCard'
-import { requestStamp } from '@/lib/customer'
+import { requestStamp, getMyProfile } from '@/lib/customer'
 import { supabase } from '@/lib/supabase'
 import { useToast } from '@/hooks/use-toast'
 import { PhoneCapturePrompt, type BusinessPreview } from '@/components/customer/PhoneCapturePrompt'
@@ -26,6 +26,7 @@ export default function BusinessPage() {
   const [hasScratchCards, setHasScratchCards] = React.useState(false)
   const [hasMenu, setHasMenu] = React.useState(false)
   const [preview, setPreview] = React.useState<BusinessPreview | null>(null)
+  const [referralCode, setReferralCode] = React.useState<string | null>(null)
   const rewardRef = React.useRef<HTMLDivElement>(null)
 
   React.useEffect(() => {
@@ -81,6 +82,11 @@ export default function BusinessPage() {
       .eq('is_available', true)
       .then(({ count }) => setHasMenu(Boolean(count)))
   }, [card?.business_id])
+
+  React.useEffect(() => {
+    if (!registered) return
+    getMyProfile().then((p) => setReferralCode(p?.referral_code ?? null))
+  }, [registered])
 
   const loadRedemption = React.useCallback(() => {
     if (!card?.membership_id) return
@@ -141,6 +147,22 @@ export default function BusinessPage() {
     } finally {
       setRequesting(false)
     }
+  }
+
+  const shareReferral = async () => {
+    if (!referralCode || !slug) return
+    const url = `${window.location.origin}/b/${slug}?ref=${referralCode}`
+    const text = `Join me on ${card?.business_name ?? 'this'}'s rewards program -- use my link and we both get a bonus stamp!`
+    if (navigator.share) {
+      try {
+        await navigator.share({ text, url })
+      } catch {
+        // user cancelled the share sheet -- nothing to do
+      }
+      return
+    }
+    await navigator.clipboard.writeText(`${text} ${url}`)
+    toast({ title: 'Referral link copied', variant: 'success' })
   }
 
   if (accountLoading) {
@@ -250,6 +272,25 @@ export default function BusinessPage() {
               )}
             </div>
           ))}
+
+        {referralCode && (
+          <button
+            type="button"
+            onClick={shareReferral}
+            className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-card p-4 text-left shadow-sm transition-colors hover:bg-muted"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <Users className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="font-semibold">Refer a friend</p>
+                <p className="text-xs text-muted-foreground">You both get a bonus stamp when they join</p>
+              </div>
+            </div>
+            <Share2 className="h-4 w-4 shrink-0 text-muted-foreground" />
+          </button>
+        )}
 
         {hasScratchCards && <ScratchWinCard businessSlug={slug!} />}
 

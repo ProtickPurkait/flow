@@ -263,6 +263,7 @@ export interface CustomerProfile {
   phone: string
   name: string | null
   email: string | null
+  referral_code: string
 }
 
 export interface PendingScratchWinRow {
@@ -339,7 +340,7 @@ export interface Database {
         Returns: { id: string; phone: string; name: string | null; customer_token: string }[]
       }
       join_business: {
-        Args: { p_business_slug: string }
+        Args: { p_business_slug: string; p_referral_code?: string | null }
         Returns: JoinBusinessResult[]
       }
       is_registered: { Args: Record<string, never>; Returns: boolean }

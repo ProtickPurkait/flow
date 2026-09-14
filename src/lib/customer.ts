@@ -34,8 +34,11 @@ export async function registerCustomer(phone: string, name: string) {
   return data?.[0]
 }
 
-export async function joinBusiness(slug: string): Promise<JoinBusinessResult> {
-  const { data, error } = await supabase.rpc('join_business', { p_business_slug: slug })
+export async function joinBusiness(slug: string, referralCode?: string | null): Promise<JoinBusinessResult> {
+  const { data, error } = await supabase.rpc('join_business', {
+    p_business_slug: slug,
+    p_referral_code: referralCode || null,
+  })
   if (error) throw error
   if (!data?.[0]) throw new Error('Could not join business')
   return data[0]
