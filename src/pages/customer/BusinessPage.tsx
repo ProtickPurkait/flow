@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useParams, Link } from 'react-router-dom'
 import gsap from 'gsap'
-import { Loader2, Stamp, Clock, Compass, Gift, Phone, MapPin, PartyPopper, UtensilsCrossed, ChevronRight } from 'lucide-react'
+import { Loader2, Stamp, Clock, Compass, Gift, Phone, MapPin, PartyPopper, UtensilsCrossed, ChevronRight, Hourglass, IndianRupee } from 'lucide-react'
 import { useCustomerAccount } from '@/hooks/useCustomerAccount'
 import { useCustomerCard } from '@/hooks/useCustomerCard'
 import { requestStamp } from '@/lib/customer'
@@ -187,6 +187,18 @@ export default function BusinessPage() {
           <StampGrid current={card.current_stamps} required={required} />
         </div>
 
+        {!redemption && card.collection_deadline_at && (
+          <div className="flex items-center gap-2 rounded-2xl border border-amber-500/25 bg-amber-500/5 px-4 py-3 text-sm font-medium text-amber-600">
+            <Hourglass className="h-4 w-4 shrink-0" />
+            {(() => {
+              const days = Math.ceil((new Date(card.collection_deadline_at).getTime() - Date.now()) / 86400000)
+              return days > 0
+                ? `Complete your card in ${days} day${days === 1 ? '' : 's'} or it resets`
+                : 'Your card is about to expire'
+            })()}
+          </div>
+        )}
+
         {!redemption &&
           (pendingStamp ? (
             <div className="flex items-center justify-center gap-2 rounded-2xl border border-primary/20 bg-primary/5 px-4 py-3.5 text-sm font-semibold text-primary">
@@ -194,10 +206,18 @@ export default function BusinessPage() {
               Waiting for staff to approve…
             </div>
           ) : (
-            <Button size="lg" onClick={handleCollect} disabled={requesting}>
-              {requesting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Stamp className="h-4 w-4" />}
-              Collect stamp
-            </Button>
+            <div className="flex flex-col gap-2">
+              <Button size="lg" onClick={handleCollect} disabled={requesting}>
+                {requesting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Stamp className="h-4 w-4" />}
+                Collect stamp
+              </Button>
+              {card.minimum_order_value > 0 && (
+                <p className="flex items-center justify-center gap-1 text-xs text-muted-foreground">
+                  <IndianRupee className="h-3 w-3" />
+                  Minimum order of ₹{card.minimum_order_value} &middot; staff will confirm before adding your stamp
+                </p>
+              )}
+            </div>
           ))}
 
         {hasScratchCards && <ScratchWinCard businessSlug={slug!} />}

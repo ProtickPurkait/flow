@@ -40,6 +40,12 @@ export interface StampProgram {
   stamps_required: number
   reward_description: string
   reward_expiry_days: number
+  minimum_order_value: number
+  collection_deadline_enabled: boolean
+  collection_deadline_days: number
+  welcome_message_template: string
+  deadline_reminder_template: string
+  card_expired_template: string
   is_active: boolean
   created_at: string
 }
@@ -53,6 +59,8 @@ export interface Membership {
   total_rewards_redeemed: number
   joined_at: string
   last_visit_at: string | null
+  current_cycle_started_at: string | null
+  collection_deadline_at: string | null
 }
 
 export interface StampEvent {
@@ -61,6 +69,7 @@ export interface StampEvent {
   business_id: string
   status: StampEventStatus
   approved_by: string | null
+  order_amount: number | null
   created_at: string
   approved_at: string | null
 }
@@ -80,6 +89,17 @@ export interface QrCode {
   business_id: string
   label: string
   created_at: string
+}
+
+export type WhatsappProvider = 'meta_cloud' | 'twilio' | 'gupshup'
+
+export interface WhatsappConfig {
+  id: string
+  business_id: string
+  provider: WhatsappProvider
+  credentials: Record<string, string>
+  is_active: boolean
+  updated_at: string
 }
 
 export interface ScratchPrize {
@@ -140,8 +160,10 @@ export interface JoinBusinessResult {
   program_name: string | null
   stamps_required: number | null
   reward_description: string | null
+  minimum_order_value: number
   current_stamps: number
   total_rewards_redeemed: number
+  collection_deadline_at: string | null
 }
 
 export interface BusinessCustomerRow {
@@ -153,6 +175,7 @@ export interface BusinessCustomerRow {
   total_rewards_redeemed: number
   joined_at: string
   last_visit_at: string | null
+  collection_deadline_at: string | null
 }
 
 export interface PendingStampRequestRow {
@@ -162,6 +185,7 @@ export interface PendingStampRequestRow {
   customer_phone: string
   current_stamps: number
   stamps_required: number | null
+  minimum_order_value: number
   requested_at: string
 }
 
@@ -197,6 +221,18 @@ export interface MyCardRow {
   stamps_required: number | null
   reward_description: string | null
   last_visit_at: string | null
+  collection_deadline_at: string | null
+}
+
+export interface WhatsappNotificationRow {
+  id: string
+  customer_name: string | null
+  customer_phone: string
+  type: 'welcome' | 'deadline_reminder' | 'card_expired' | 'promo'
+  message_body: string
+  status: 'pending' | 'sent' | 'failed' | 'skipped_not_configured'
+  created_at: string
+  sent_at: string | null
 }
 
 export interface MyRewardRow {
@@ -281,6 +317,7 @@ export interface Database {
       scratch_draws: { Row: ScratchDraw; Insert: Partial<ScratchDraw>; Update: Partial<ScratchDraw> }
       menu_categories: { Row: MenuCategory; Insert: Partial<MenuCategory>; Update: Partial<MenuCategory> }
       menu_items: { Row: MenuItem; Insert: Partial<MenuItem>; Update: Partial<MenuItem> }
+      whatsapp_configs: { Row: WhatsappConfig; Insert: Partial<WhatsappConfig>; Update: Partial<WhatsappConfig> }
     }
     Views: Record<string, never>
     Functions: {
@@ -314,6 +351,8 @@ export interface Database {
       get_business_stats: { Args: { p_business_id: string }; Returns: BusinessStatsRow[] }
       get_weekly_scans: { Args: { p_business_id: string }; Returns: DailyCountRow[] }
       get_customer_growth: { Args: { p_business_id: string }; Returns: DailyCountRow[] }
+      send_promo_message: { Args: { p_business_id: string; p_message: string }; Returns: number }
+      list_whatsapp_notifications: { Args: { p_business_id: string; p_limit?: number }; Returns: WhatsappNotificationRow[] }
     }
   }
 }

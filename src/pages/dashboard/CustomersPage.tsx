@@ -1,10 +1,13 @@
 import * as React from 'react'
 import { useOutletContext } from 'react-router-dom'
-import { Download, Loader2, Users2, Search } from 'lucide-react'
+import { Download, Loader2, Users2, Search, MessageCircle, Hourglass, Send } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+import { useToast } from '@/hooks/use-toast'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
 import type { Business, BusinessCustomerRow } from '@/types/database'
 
@@ -28,14 +31,23 @@ function toCsv(rows: BusinessCustomerRow[]) {
   return [header.join(','), ...lines].join('\n')
 }
 
+function daysLeft(deadline: string) {
+  return Math.ceil((new Date(deadline).getTime() - Date.now()) / 86400000)
+}
+
 export default function CustomersPage() {
   const { business } = useOutletContext<{ business: Business }>()
+  const { toast } = useToast()
   const [rows, setRows] = React.useState<BusinessCustomerRow[]>([])
   const [loading, setLoading] = React.useState(true)
   const [query, setQuery] = React.useState('')
   const [status, setStatus] = React.useState<StatusFilter>('all')
   const [fromDate, setFromDate] = React.useState('')
   const [toDate, setToDate] = React.useState('')
+
+  const [promoOpen, setPromoOpen] = React.useState(false)
+  const [promoMessage, setPromoMessage] = React.useState('')
+  const [sendingPromo, setSendingPromo] = React.useState(false)
 
   React.useEffect(() => {
     supabase.rpc('list_business_customers', { p_business_id: business.id }).then(({ data }) => {
@@ -70,9 +82,48 @@ export default function CustomersPage() {
     URL.revokeObjectURL(url)
   }
 
+  const sendPromo = async () => {
+    if (!promoMessage.trim()) return
+    setSendingPromo(true)
+    const { data, error } = await supabase.rpc('send_promo_message', {
+      p_business_id: business.id,
+      p_message: promoMessage.trim(),
+    })
+    setSendingPromo(false)
+    if (error) {
+      toast({ title: 'Could not queue message', description: error.message, variant: 'destructive' })
+      return
+    }
+    toast({
+      title: `Queued for ${data} customer${data === 1 ? '' : 's'}`,
+      description: 'Sends once WhatsApp is connected -- see Getting Started for setup.',
+      variant: 'success',
+    })
+    setPromoMessage('')
+    setPromoOpen(false)
+  }
+
   return (
     <div className="flex flex-col gap-4">
       <h1 className="font-display text-xl font-bold">Customers</h1>
+
+      <Card>
+        <CardContent className="flex items-center justify-between gap-3 p-4">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-secondary/10 text-secondary">
+              <MessageCircle className="h-4 w-4" />
+            </div>
+            <div>
+              <p className="font-semibold">Message your customers</p>
+              <p className="text-xs text-muted-foreground">Send a promo over WhatsApp to everyone on your card</p>
+            </div>
+          </div>
+          <Button size="sm" variant="outline" onClick={() => setPromoOpen(true)}>
+            <Send className="h-3.5 w-3.5" />
+            Send
+          </Button>
+        </CardContent>
+      </Card>
 
       <div className="relative">
         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -124,25 +175,58 @@ export default function CustomersPage() {
         </Card>
       ) : (
         <div className="flex flex-col gap-2">
-          {filtered.map((r) => (
-            <Card key={r.customer_id}>
-              <CardContent className="flex items-center justify-between gap-3 p-4">
-                <div className="min-w-0">
-                  <p className="truncate font-semibold">{r.name || r.phone}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {r.phone} &middot; {r.current_stamps}
-                    {r.stamps_required ? `/${r.stamps_required}` : ''} stamps
-                    {r.total_rewards_redeemed > 0 ? ` · ${r.total_rewards_redeemed} redeemed` : ''}
-                  </p>
-                </div>
-                <p className="shrink-0 text-xs text-muted-foreground">
-                  {r.last_visit_at ? new Date(r.last_visit_at).toLocaleDateString() : 'Never'}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
+          {filtered.map((r) => {
+            const left = r.collection_deadline_at ? daysLeft(r.collection_deadline_at) : null
+            return (
+              <Card key={r.customer_id}>
+                <CardContent className="flex items-center justify-between gap-3 p-4">
+                  <div className="min-w-0">
+                    <p className="truncate font-semibold">{r.name || r.phone}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {r.phone} &middot; {r.current_stamps}
+                      {r.stamps_required ? `/${r.stamps_required}` : ''} stamps
+                      {r.total_rewards_redeemed > 0 ? ` · ${r.total_rewards_redeemed} redeemed` : ''}
+                    </p>
+                  </div>
+                  <div className="flex shrink-0 flex-col items-end gap-1">
+                    {left != null && (
+                      <span className="flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-0.5 text-[11px] font-semibold text-amber-600">
+                        <Hourglass className="h-3 w-3" />
+                        {left > 0 ? `${left}d left` : 'expiring'}
+                      </span>
+                    )}
+                    <p className="text-xs text-muted-foreground">
+                      {r.last_visit_at ? new Date(r.last_visit_at).toLocaleDateString() : 'Never'}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            )
+          })}
         </div>
       )}
+
+      <Dialog open={promoOpen} onOpenChange={setPromoOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Send a promo message</DialogTitle>
+            <DialogDescription>Queued as a WhatsApp message to every customer on your loyalty program.</DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-3">
+            <Textarea
+              value={promoMessage}
+              onChange={(e) => setPromoMessage(e.target.value)}
+              placeholder="e.g. We just added a Scratch & Win prize this weekend -- come collect your stamp!"
+              className="min-h-[100px]"
+              autoFocus
+            />
+            <Button disabled={sendingPromo || !promoMessage.trim()} onClick={sendPromo}>
+              {sendingPromo ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+              Queue message
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

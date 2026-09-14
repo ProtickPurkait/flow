@@ -13,6 +13,7 @@ import {
   RefreshCw,
   Pencil,
   LogOut,
+  MessageCircle,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/hooks/useAuth'
@@ -24,11 +25,37 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { BUSINESS_CATEGORIES } from '@/lib/categories'
-import type { Business } from '@/types/database'
+import type { Business, WhatsappConfig, WhatsappProvider } from '@/types/database'
 
-type Section = 'identity' | 'location' | 'contact' | 'social' | null
+type Section = 'identity' | 'location' | 'contact' | 'social' | 'whatsapp' | null
+
+const WHATSAPP_PROVIDER_LABELS: Record<WhatsappProvider, string> = {
+  meta_cloud: 'Meta Cloud API',
+  twilio: 'Twilio',
+  gupshup: 'Gupshup',
+}
+
+const WHATSAPP_PROVIDER_FIELDS: Record<
+  WhatsappProvider,
+  { key: string; label: string; placeholder: string; secret?: boolean }[]
+> = {
+  meta_cloud: [
+    { key: 'phone_number_id', label: 'Phone number ID', placeholder: 'e.g. 109876543210123' },
+    { key: 'access_token', label: 'Access token', placeholder: 'Permanent access token', secret: true },
+  ],
+  twilio: [
+    { key: 'account_sid', label: 'Account SID', placeholder: 'ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' },
+    { key: 'auth_token', label: 'Auth token', placeholder: 'Your Twilio auth token', secret: true },
+    { key: 'from_number', label: 'WhatsApp sender number', placeholder: '+14155238886' },
+  ],
+  gupshup: [
+    { key: 'api_key', label: 'API key', placeholder: 'Your Gupshup API key', secret: true },
+    { key: 'source_number', label: 'Source number', placeholder: '+919876543210' },
+    { key: 'app_name', label: 'App name', placeholder: 'Your Gupshup app name' },
+  ],
+}
 
 export default function SettingsPage() {
   const { business } = useOutletContext<{ business: Business }>()
@@ -58,6 +85,28 @@ export default function SettingsPage() {
   })
   const [autoApprove, setAutoApprove] = React.useState(business.auto_approve_scans)
   const [allowMultiple, setAllowMultiple] = React.useState(business.allow_multiple_scans_per_day)
+
+  const [whatsappConfig, setWhatsappConfig] = React.useState<WhatsappConfig | null>(null)
+  const [whatsappProvider, setWhatsappProvider] = React.useState<WhatsappProvider>('meta_cloud')
+  const [whatsappCreds, setWhatsappCreds] = React.useState<Record<string, string>>({})
+  const [whatsappActive, setWhatsappActive] = React.useState(false)
+  const [savingWhatsapp, setSavingWhatsapp] = React.useState(false)
+
+  React.useEffect(() => {
+    supabase
+      .from('whatsapp_configs')
+      .select('*')
+      .eq('business_id', business.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data) {
+          setWhatsappConfig(data)
+          setWhatsappProvider(data.provider)
+          setWhatsappCreds(data.credentials ?? {})
+          setWhatsappActive(data.is_active)
+        }
+      })
+  }, [business.id])
 
   const update = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, [key]: e.target.value }))
@@ -139,6 +188,32 @@ export default function SettingsPage() {
     navigate('/login')
   }
 
+  const saveWhatsappConfig = async () => {
+    setSavingWhatsapp(true)
+    const { data, error } = await supabase
+      .from('whatsapp_configs')
+      .upsert(
+        {
+          business_id: business.id,
+          provider: whatsappProvider,
+          credentials: whatsappCreds,
+          is_active: whatsappActive,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: 'business_id' }
+      )
+      .select()
+      .single()
+    setSavingWhatsapp(false)
+    if (error) {
+      toast({ title: 'Could not save', description: error.message, variant: 'destructive' })
+      return
+    }
+    setWhatsappConfig(data)
+    toast({ title: 'WhatsApp settings saved', variant: 'success' })
+    setOpenSection(null)
+  }
+
   return (
     <div className="flex flex-col gap-4">
       <div>
@@ -186,6 +261,19 @@ export default function SettingsPage() {
         title="Social Links & Reviews"
         subtitle="Manage your online presence"
         onEdit={() => setOpenSection('social')}
+      />
+      <SettingsRow
+        icon={MessageCircle}
+        tone="text-success bg-success/10"
+        title="WhatsApp Business API"
+        subtitle={
+          whatsappConfig?.is_active
+            ? `Connected · ${WHATSAPP_PROVIDER_LABELS[whatsappConfig.provider]}`
+            : whatsappConfig
+              ? `Saved but inactive · ${WHATSAPP_PROVIDER_LABELS[whatsappConfig.provider]}`
+              : 'Not connected'
+        }
+        onEdit={() => setOpenSection('whatsapp')}
       />
 
       <Card>
@@ -368,6 +456,67 @@ export default function SettingsPage() {
               onClick={() => saveSection({ google_review_url: form.google_review_url, instagram_handle: form.instagram_handle })}
             >
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+              Save
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* WhatsApp Business API dialog */}
+      <Dialog open={openSection === 'whatsapp'} onOpenChange={(o) => !o && setOpenSection(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>WhatsApp Business API</DialogTitle>
+            <DialogDescription>
+              Plug in the provider you use to send WhatsApp messages. Switch providers any time -- nothing else
+              changes.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-1.5">
+              <Label>Provider</Label>
+              <Select
+                value={whatsappProvider}
+                onValueChange={(v) => {
+                  setWhatsappProvider(v as WhatsappProvider)
+                  setWhatsappCreds({})
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {(Object.keys(WHATSAPP_PROVIDER_LABELS) as WhatsappProvider[]).map((p) => (
+                    <SelectItem key={p} value={p}>
+                      {WHATSAPP_PROVIDER_LABELS[p]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {WHATSAPP_PROVIDER_FIELDS[whatsappProvider].map((field) => (
+              <div key={field.key} className="flex flex-col gap-1.5">
+                <Label>{field.label}</Label>
+                <Input
+                  type={field.secret ? 'password' : 'text'}
+                  placeholder={field.placeholder}
+                  value={whatsappCreds[field.key] ?? ''}
+                  onChange={(e) => setWhatsappCreds((c) => ({ ...c, [field.key]: e.target.value }))}
+                />
+              </div>
+            ))}
+
+            <div className="flex items-center justify-between gap-3 rounded-xl bg-muted/60 p-3">
+              <div>
+                <p className="text-sm font-semibold">Active</p>
+                <p className="text-xs text-muted-foreground">Turn off to pause sending without losing these credentials</p>
+              </div>
+              <Switch checked={whatsappActive} onCheckedChange={setWhatsappActive} />
+            </div>
+
+            <Button disabled={savingWhatsapp} onClick={saveWhatsappConfig}>
+              {savingWhatsapp ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
               Save
             </Button>
           </div>

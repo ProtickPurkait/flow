@@ -14,7 +14,9 @@ import {
   BadgeCheck,
   Copy,
   Download,
+  IndianRupee,
 } from 'lucide-react'
+import { Input } from '@/components/ui/input'
 import { supabase } from '@/lib/supabase'
 import { useToast } from '@/hooks/use-toast'
 import { Card, CardContent } from '@/components/ui/card'
@@ -47,6 +49,7 @@ export default function DashboardHome() {
   const [loading, setLoading] = React.useState(true)
   const [busyId, setBusyId] = React.useState<string | null>(null)
   const [staffId, setStaffId] = React.useState<string | null>(null)
+  const [amountDrafts, setAmountDrafts] = React.useState<Record<string, string>>({})
   const listRef = React.useRef<HTMLDivElement>(null)
 
   const targetUrl = `${window.location.origin}/b/${business.slug}`
@@ -118,16 +121,26 @@ export default function DashboardHome() {
     )
   }, [pending, loading])
 
-  const respond = async (eventId: string, approve: boolean) => {
+  const respond = async (eventId: string, approve: boolean, orderAmount?: number) => {
     setBusyId(eventId)
-    const { error } = await supabase
-      .from('stamp_events')
-      .update({ status: approve ? 'approved' : 'rejected', approved_by: staffId })
-      .eq('id', eventId)
+    const payload: Record<string, unknown> = { status: approve ? 'approved' : 'rejected', approved_by: staffId }
+    if (approve && orderAmount != null) payload.order_amount = orderAmount
+    const { error } = await supabase.from('stamp_events').update(payload).eq('id', eventId)
     if (error) {
-      toast({ title: 'Something went wrong', description: error.message, variant: 'destructive' })
+      toast({
+        title: 'Something went wrong',
+        description: error.message.includes('row-level security')
+          ? 'Order amount is below the minimum required for this stamp card.'
+          : error.message,
+        variant: 'destructive',
+      })
     } else {
       toast({ title: approve ? 'Stamp approved' : 'Request rejected', variant: approve ? 'success' : 'default' })
+      setAmountDrafts((d) => {
+        const next = { ...d }
+        delete next[eventId]
+        return next
+      })
     }
     setBusyId(null)
   }
@@ -202,34 +215,59 @@ export default function DashboardHome() {
           </Card>
         ) : (
           <div ref={listRef} className="flex flex-col gap-3">
-            {pending.map((p) => (
-              <Card key={p.stamp_event_id} data-pending-item>
-                <CardContent className="flex items-center justify-between gap-4 p-4">
-                  <div className="min-w-0">
-                    <p className="truncate font-semibold">{p.customer_name || p.customer_phone}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {p.current_stamps}
-                      {p.stamps_required ? ` / ${p.stamps_required}` : ''} stamps &middot; requested{' '}
-                      {new Date(p.requested_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </p>
-                  </div>
-                  <div className="flex shrink-0 gap-2">
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      className="border-destructive/30 text-destructive hover:bg-destructive/10"
-                      disabled={busyId === p.stamp_event_id}
-                      onClick={() => respond(p.stamp_event_id, false)}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                    <Button size="icon" disabled={busyId === p.stamp_event_id} onClick={() => respond(p.stamp_event_id, true)}>
-                      <Check className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+            {pending.map((p) => {
+              const requiresAmount = p.minimum_order_value > 0
+              const draft = amountDrafts[p.stamp_event_id] ?? ''
+              const draftAmount = Number(draft)
+              const amountValid = draft.trim() !== '' && draftAmount >= p.minimum_order_value
+              return (
+                <Card key={p.stamp_event_id} data-pending-item>
+                  <CardContent className="flex flex-col gap-3 p-4">
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="min-w-0">
+                        <p className="truncate font-semibold">{p.customer_name || p.customer_phone}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {p.current_stamps}
+                          {p.stamps_required ? ` / ${p.stamps_required}` : ''} stamps &middot; requested{' '}
+                          {new Date(p.requested_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      </div>
+                      <div className="flex shrink-0 gap-2">
+                        <Button
+                          size="icon"
+                          variant="outline"
+                          className="border-destructive/30 text-destructive hover:bg-destructive/10"
+                          disabled={busyId === p.stamp_event_id}
+                          onClick={() => respond(p.stamp_event_id, false)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="icon"
+                          disabled={busyId === p.stamp_event_id || (requiresAmount && !amountValid)}
+                          onClick={() => respond(p.stamp_event_id, true, requiresAmount ? draftAmount : undefined)}
+                        >
+                          <Check className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                    {requiresAmount && (
+                      <div className="flex items-center gap-2">
+                        <IndianRupee className="h-4 w-4 shrink-0 text-muted-foreground" />
+                        <Input
+                          type="number"
+                          min={0}
+                          placeholder={`Order amount (min ${p.minimum_order_value})`}
+                          value={draft}
+                          onChange={(e) => setAmountDrafts((d) => ({ ...d, [p.stamp_event_id]: e.target.value }))}
+                          className="h-9"
+                        />
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )
+            })}
           </div>
         )}
       </div>

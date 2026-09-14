@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useOutletContext, Link } from 'react-router-dom'
-import { ChevronLeft, Loader2, Save, Minus, Plus, Calendar, Gift } from 'lucide-react'
+import { ChevronLeft, Loader2, Save, Minus, Plus, Calendar, Gift, Hourglass, MessageCircle, IndianRupee } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useToast } from '@/hooks/use-toast'
 import { Card, CardContent } from '@/components/ui/card'
@@ -21,6 +21,13 @@ export default function StampCardPage() {
   const [stampsRequired, setStampsRequired] = React.useState(8)
   const [rewardExpiryDays, setRewardExpiryDays] = React.useState(30)
   const [rewardDescription, setRewardDescription] = React.useState('')
+  const [deadlineEnabled, setDeadlineEnabled] = React.useState(false)
+  const [deadlineDays, setDeadlineDays] = React.useState(90)
+  const [minOrderEnabled, setMinOrderEnabled] = React.useState(false)
+  const [minOrderValue, setMinOrderValue] = React.useState(100)
+  const [welcomeTemplate, setWelcomeTemplate] = React.useState('')
+  const [reminderTemplate, setReminderTemplate] = React.useState('')
+  const [expiredTemplate, setExpiredTemplate] = React.useState('')
 
   React.useEffect(() => {
     supabase
@@ -37,6 +44,13 @@ export default function StampCardPage() {
           setStampsRequired(data.stamps_required)
           setRewardExpiryDays(data.reward_expiry_days)
           setRewardDescription(data.reward_description)
+          setDeadlineEnabled(data.collection_deadline_enabled)
+          setDeadlineDays(data.collection_deadline_days)
+          setMinOrderEnabled(data.minimum_order_value > 0)
+          if (data.minimum_order_value > 0) setMinOrderValue(data.minimum_order_value)
+          setWelcomeTemplate(data.welcome_message_template)
+          setReminderTemplate(data.deadline_reminder_template)
+          setExpiredTemplate(data.card_expired_template)
         }
         setLoading(false)
       })
@@ -52,6 +66,12 @@ export default function StampCardPage() {
         stamps_required: stampsRequired,
         reward_expiry_days: rewardExpiryDays,
         reward_description: rewardDescription,
+        collection_deadline_enabled: deadlineEnabled,
+        collection_deadline_days: deadlineDays,
+        minimum_order_value: minOrderEnabled ? minOrderValue : 0,
+        welcome_message_template: welcomeTemplate,
+        deadline_reminder_template: reminderTemplate,
+        card_expired_template: expiredTemplate,
       })
       .eq('id', program.id)
     setSaving(false)
@@ -133,6 +153,144 @@ export default function StampCardPage() {
         </CardContent>
       </Card>
 
+      <Card>
+        <CardContent className="flex flex-col gap-4 p-4">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-success/10 text-success">
+                <IndianRupee className="h-4 w-4" />
+              </div>
+              <div>
+                <p className="font-semibold">Minimum order value</p>
+                <p className="text-xs text-muted-foreground">Only approve a stamp if the order meets this amount</p>
+              </div>
+            </div>
+            <Switch checked={minOrderEnabled} onCheckedChange={setMinOrderEnabled} />
+          </div>
+
+          {minOrderEnabled && (
+            <>
+              <div className="flex flex-col gap-1.5">
+                <Label className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+                  Minimum order amount
+                </Label>
+                <div className="flex items-center gap-2">
+                  <IndianRupee className="h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="number"
+                    min={1}
+                    value={minOrderValue}
+                    onChange={(e) => setMinOrderValue(Number(e.target.value))}
+                    className="w-28"
+                  />
+                </div>
+              </div>
+              <div className="flex items-start gap-2 rounded-xl bg-success/5 p-3 text-xs text-muted-foreground">
+                <IndianRupee className="mt-0.5 h-3.5 w-3.5 shrink-0 text-success" />
+                <span>
+                  Staff will enter the order amount when approving a stamp request, so Auto Approve Scans is
+                  skipped for this program while this is on -- every scan needs a human to confirm the total.
+                </span>
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="flex flex-col gap-4 p-4">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-secondary/10 text-secondary">
+              <MessageCircle className="h-4 w-4" />
+            </div>
+            <div>
+              <p className="font-semibold">Welcome message</p>
+              <p className="text-xs text-muted-foreground">Sent over WhatsApp the moment someone joins</p>
+            </div>
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <Textarea
+              value={welcomeTemplate}
+              onChange={(e) => setWelcomeTemplate(e.target.value)}
+              className="min-h-[80px]"
+            />
+            <PlaceholderChips tokens={['{business_name}', '{stamps_required}', '{reward_description}']} />
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="flex flex-col gap-4 p-4">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600">
+                <Hourglass className="h-4 w-4" />
+              </div>
+              <div>
+                <p className="font-semibold">Time-bound collection</p>
+                <p className="text-xs text-muted-foreground">Require the full card within a deadline, or it resets</p>
+              </div>
+            </div>
+            <Switch checked={deadlineEnabled} onCheckedChange={setDeadlineEnabled} />
+          </div>
+
+          {deadlineEnabled && (
+            <>
+              <div className="flex flex-col gap-1.5">
+                <Label className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+                  Days to complete, from the first stamp
+                </Label>
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="number"
+                    min={1}
+                    value={deadlineDays}
+                    onChange={(e) => setDeadlineDays(Number(e.target.value))}
+                    className="w-24"
+                  />
+                  <span className="text-sm text-muted-foreground">Days (90 &asymp; 3 months)</span>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2 rounded-xl bg-amber-500/5 p-3 text-xs text-muted-foreground">
+                <MessageCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-600" />
+                <span>
+                  Once WhatsApp is connected, these messages send automatically -- reminders at 7, 3, and 1 day
+                  before a card expires, and a notice if it does. Write them however you like.
+                </span>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <Label className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+                  Deadline reminder (sent at 7, 3, and 1 day left)
+                </Label>
+                <Textarea
+                  value={reminderTemplate}
+                  onChange={(e) => setReminderTemplate(e.target.value)}
+                  className="min-h-[90px]"
+                />
+                <PlaceholderChips
+                  tokens={['{days_left}', '{days_unit}', '{business_name}', '{current_stamps}', '{stamps_required}']}
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <Label className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+                  Card expired notice
+                </Label>
+                <Textarea
+                  value={expiredTemplate}
+                  onChange={(e) => setExpiredTemplate(e.target.value)}
+                  className="min-h-[80px]"
+                />
+                <PlaceholderChips tokens={['{business_name}']} />
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
+
       <Button disabled={saving} onClick={handleSave} size="lg">
         {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
         Save Reward Programs
@@ -164,6 +322,18 @@ export default function StampCardPage() {
           </div>
         </CardContent>
       </Card>
+    </div>
+  )
+}
+
+function PlaceholderChips({ tokens }: { tokens: string[] }) {
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {tokens.map((t) => (
+        <span key={t} className="rounded-md bg-muted px-1.5 py-0.5 font-mono text-[11px] text-muted-foreground">
+          {t}
+        </span>
+      ))}
     </div>
   )
 }
