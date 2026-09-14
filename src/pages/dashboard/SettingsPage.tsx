@@ -16,6 +16,7 @@ import {
   MessageCircle,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+import { compressImage } from '@/lib/image'
 import { useAuth } from '@/hooks/useAuth'
 import { useSuperAdmin } from '@/hooks/useSuperAdmin'
 import { useToast } from '@/hooks/use-toast'
@@ -129,9 +130,10 @@ export default function SettingsPage() {
   }
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
+    const rawFile = e.target.files?.[0]
+    if (!rawFile) return
     setUploading(true)
+    const file = await compressImage(rawFile)
     const ext = file.name.split('.').pop()
     const path = `${business.id}/logo.${ext}`
     const { error } = await supabase.storage.from('business-logos').upload(path, file, { upsert: true })

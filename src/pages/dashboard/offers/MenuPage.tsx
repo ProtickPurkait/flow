@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useOutletContext, Link } from 'react-router-dom'
 import { ChevronLeft, Loader2, Plus, Trash2, UtensilsCrossed, GripVertical, Camera } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+import { compressImage } from '@/lib/image'
 import { useToast } from '@/hooks/use-toast'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -97,8 +98,9 @@ export default function MenuPage() {
     await supabase.from('menu_items').delete().eq('id', id)
   }
 
-  const uploadItemImage = async (item: MenuItem, file: File) => {
+  const uploadItemImage = async (item: MenuItem, rawFile: File) => {
     setUploadingId(item.id)
+    const file = await compressImage(rawFile)
     const ext = file.name.split('.').pop()
     const path = `${business.id}/${item.id}.${ext}`
     const { error } = await supabase.storage.from('menu-item-images').upload(path, file, { upsert: true })
