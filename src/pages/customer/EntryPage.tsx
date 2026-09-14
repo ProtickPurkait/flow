@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useNavigate, useParams, Link } from 'react-router-dom'
 import gsap from 'gsap'
-import { Loader2, ArrowRight, Compass } from 'lucide-react'
+import { Loader2, ArrowRight, Compass, ScanLine, Stamp, Gift } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { ensureCustomerSession, isRegistered, registerCustomer, joinBusiness } from '@/lib/customer'
 import { Button } from '@/components/ui/button'
@@ -18,6 +18,7 @@ export default function EntryPage() {
 
   const [phase, setPhase] = React.useState<Phase>('loading')
   const [business, setBusiness] = React.useState<Business | null>(null)
+  const [program, setProgram] = React.useState<{ stamps_required: number; reward_description: string } | null>(null)
   const [phone, setPhone] = React.useState('')
   const [name, setName] = React.useState('')
   const [error, setError] = React.useState<string | null>(null)
@@ -43,6 +44,16 @@ export default function EntryPage() {
         return
       }
       setBusiness(biz)
+
+      supabase
+        .from('stamp_programs')
+        .select('stamps_required, reward_description')
+        .eq('business_id', biz.id)
+        .eq('is_active', true)
+        .maybeSingle()
+        .then(({ data }) => {
+          if (!cancelled) setProgram(data)
+        })
 
       await ensureCustomerSession()
       const registered = await isRegistered()
@@ -128,9 +139,34 @@ export default function EntryPage() {
         </div>
 
         <h1 className="mb-3 text-3xl font-bold leading-tight tracking-tight text-foreground">Start collecting stamps!</h1>
-        <p className="mb-8 text-base text-muted-foreground">
-          Enter your number and unlock rewards at {business?.name}.
-        </p>
+        {program ? (
+          <p className="mb-6 text-base text-muted-foreground">
+            Collect <span className="font-semibold text-foreground">{program.stamps_required} stamps</span> to
+            unlock: {program.reward_description}
+          </p>
+        ) : (
+          <p className="mb-6 text-base text-muted-foreground">
+            Enter your number and unlock rewards at {business?.name}.
+          </p>
+        )}
+
+        <div className="mb-8 flex items-center justify-between gap-2 rounded-2xl border border-border bg-card/70 p-3.5">
+          {[
+            { icon: ScanLine, label: 'Scan' },
+            { icon: Stamp, label: 'Collect' },
+            { icon: Gift, label: 'Unlock' },
+          ].map((step, i, arr) => (
+            <React.Fragment key={step.label}>
+              <div className="flex flex-1 flex-col items-center gap-1.5 text-center">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                  <step.icon className="h-4.5 w-4.5" />
+                </div>
+                <p className="text-xs font-medium text-foreground">{step.label}</p>
+              </div>
+              {i < arr.length - 1 && <ArrowRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />}
+            </React.Fragment>
+          ))}
+        </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           <div className="flex flex-col gap-2">

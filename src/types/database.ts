@@ -22,6 +22,7 @@ export interface Business {
   auto_approve_scans: boolean
   allow_multiple_scans_per_day: boolean
   hours: string | null
+  plan: 'starter' | 'growth' | 'automated'
   created_at: string
 }
 
@@ -88,6 +89,17 @@ export interface QrCode {
   id: string
   business_id: string
   label: string
+  created_at: string
+}
+
+export interface Subscription {
+  id: string
+  business_id: string
+  plan: 'starter' | 'growth' | 'automated'
+  status: 'active' | 'paused' | 'cancelled'
+  started_at: string
+  current_period_end: string | null
+  notes: string | null
   created_at: string
 }
 
@@ -318,6 +330,7 @@ export interface Database {
       menu_categories: { Row: MenuCategory; Insert: Partial<MenuCategory>; Update: Partial<MenuCategory> }
       menu_items: { Row: MenuItem; Insert: Partial<MenuItem>; Update: Partial<MenuItem> }
       whatsapp_configs: { Row: WhatsappConfig; Insert: Partial<WhatsappConfig>; Update: Partial<WhatsappConfig> }
+      subscriptions: { Row: Subscription; Insert: Partial<Subscription>; Update: Partial<Subscription> }
     }
     Views: Record<string, never>
     Functions: {

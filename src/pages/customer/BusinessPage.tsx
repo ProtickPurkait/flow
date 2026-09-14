@@ -7,7 +7,7 @@ import { useCustomerCard } from '@/hooks/useCustomerCard'
 import { requestStamp } from '@/lib/customer'
 import { supabase } from '@/lib/supabase'
 import { useToast } from '@/hooks/use-toast'
-import { PhoneCapturePrompt } from '@/components/customer/PhoneCapturePrompt'
+import { PhoneCapturePrompt, type BusinessPreview } from '@/components/customer/PhoneCapturePrompt'
 import { Button } from '@/components/ui/button'
 import { StampGrid } from '@/components/customer/StampGrid'
 import { EngagementPrompts } from '@/components/customer/EngagementPrompts'
@@ -25,7 +25,38 @@ export default function BusinessPage() {
   const [redemption, setRedemption] = React.useState<RewardRedemption | null>(null)
   const [hasScratchCards, setHasScratchCards] = React.useState(false)
   const [hasMenu, setHasMenu] = React.useState(false)
+  const [preview, setPreview] = React.useState<BusinessPreview | null>(null)
   const rewardRef = React.useRef<HTMLDivElement>(null)
+
+  React.useEffect(() => {
+    if (!slug || registered) return
+    let cancelled = false
+    supabase
+      .from('businesses')
+      .select('id, name, logo_url')
+      .eq('slug', slug)
+      .eq('status', 'active')
+      .maybeSingle()
+      .then(async ({ data: biz }) => {
+        if (cancelled || !biz) return
+        const { data: program } = await supabase
+          .from('stamp_programs')
+          .select('stamps_required, reward_description')
+          .eq('business_id', biz.id)
+          .eq('is_active', true)
+          .maybeSingle()
+        if (cancelled) return
+        setPreview({
+          name: biz.name,
+          logoUrl: biz.logo_url,
+          stampsRequired: program?.stamps_required ?? null,
+          rewardDescription: program?.reward_description ?? null,
+        })
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [slug, registered])
 
   React.useEffect(() => {
     if (!card?.business_id) return
@@ -121,7 +152,7 @@ export default function BusinessPage() {
   }
 
   if (!registered) {
-    return <PhoneCapturePrompt onRegistered={refreshAccount} />
+    return <PhoneCapturePrompt onRegistered={refreshAccount} businessPreview={preview} />
   }
 
   if (loading) {
