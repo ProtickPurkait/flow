@@ -98,6 +98,13 @@ export default function LoginPage() {
             Sign in
           </Button>
 
+          <p className="text-center text-sm text-muted-foreground">
+            New to Flow?{' '}
+            <Link to="/signup" className="font-semibold text-foreground underline underline-offset-2">
+              Create your business account
+            </Link>
+          </p>
+
           <div className="flex flex-col items-center gap-3 pb-4 pt-1">
             <p className="text-center text-xs text-muted-foreground">
               By proceeding, you agree to our{' '}

@@ -12,6 +12,7 @@ import { CustomerShell } from '@/components/layout/CustomerShell'
 import HomePage from '@/pages/customer/HomePage'
 
 const LoginPage = lazy(() => import('@/pages/dashboard/LoginPage'))
+const SignupPage = lazy(() => import('@/pages/dashboard/SignupPage'))
 const DashboardHome = lazy(() => import('@/pages/dashboard/DashboardHome'))
 const CustomersPage = lazy(() => import('@/pages/dashboard/CustomersPage'))
 const WinnersPage = lazy(() => import('@/pages/dashboard/WinnersPage'))
@@ -48,6 +49,7 @@ export default function App() {
         <Suspense fallback={<RouteFallback />}>
           <Routes>
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignupPage />} />
 
             <Route element={<ProtectedRoute />}>
               <Route element={<DashboardShell />}>

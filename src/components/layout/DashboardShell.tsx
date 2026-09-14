@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom'
-import { LayoutGrid, Users, Gift, Settings, Loader2, User as UserIcon, ShieldCheck, BadgeCheck } from 'lucide-react'
+import { LayoutGrid, Users, Gift, Settings, Loader2, User as UserIcon, ShieldCheck, BadgeCheck, Clock } from 'lucide-react'
 import { useBusinessStaff } from '@/hooks/useBusinessStaff'
 import { useSuperAdmin } from '@/hooks/useSuperAdmin'
 import { Button } from '@/components/ui/button'
@@ -68,6 +68,16 @@ export function DashboardShell() {
             </div>
           )}
         </header>
+
+        {business && business.status === 'paused' && (
+          <div className="mx-4 -mt-3 flex items-start gap-2 rounded-2xl border border-amber-500/25 bg-amber-500/10 p-3.5 text-xs text-amber-700 shadow-sm">
+            <Clock className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+            <span>
+              <strong className="font-semibold">Pending review.</strong> Set everything up now -- your customer page
+              goes live once Fenlark activates your account.
+            </span>
+          </div>
+        )}
 
         <main className="px-4 pt-5">
           {loading ? (
