@@ -1,6 +1,7 @@
 import { Suspense, lazy } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { Loader2 } from 'lucide-react'
+import { Analytics } from '@vercel/analytics/react'
 import { AuthProvider } from '@/hooks/useAuth'
 import { ToastProvider } from '@/hooks/use-toast'
 import { Toaster } from '@/components/ui/toaster'
@@ -89,6 +90,7 @@ export default function App() {
           </Routes>
         </Suspense>
         <Toaster />
+        <Analytics />
       </ToastProvider>
     </AuthProvider>
   )
