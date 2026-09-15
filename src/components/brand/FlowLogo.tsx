@@ -13,10 +13,10 @@ export function FlowLogo({ className }: FlowLogoProps) {
       role="img"
       aria-label="Fenlark Flow"
     >
-      <rect width="64" height="64" rx="14" fill="#0A0D14" />
-      <path d="M16 14 L48 14 L48 24 L28 24 L28 44 L16 54 Z" fill="#3D5CDB" />
-      <rect x="16" y="28" width="20" height="10" fill="#3D5CDB" />
-      <circle cx="45" cy="33" r="4.5" fill="#5B7FFA" />
+      <rect width="64" height="64" rx="14" fill="hsl(var(--background))" />
+      <path d="M16 14 L48 14 L48 24 L28 24 L28 44 L16 54 Z" fill="hsl(var(--secondary))" />
+      <rect x="16" y="28" width="20" height="10" fill="hsl(var(--secondary))" />
+      <circle cx="45" cy="33" r="4.5" fill="hsl(var(--primary))" />
     </svg>
   )
 }

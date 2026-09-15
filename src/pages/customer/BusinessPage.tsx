@@ -188,8 +188,10 @@ export default function BusinessPage() {
   if (notFound || !card) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-background px-6 text-center">
-        <Compass className="h-8 w-8 text-muted-foreground" />
-        <p className="font-semibold">We couldn't load this business</p>
+        <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-secondary/20 text-secondary-foreground">
+          <Compass className="h-6 w-6" />
+        </div>
+        <p className="font-semibold text-foreground">We couldn't load this business</p>
         <p className="text-sm text-muted-foreground">Try scanning the QR code again.</p>
       </div>
     )
@@ -199,39 +201,39 @@ export default function BusinessPage() {
 
   return (
     <div className="min-h-screen bg-background pb-28">
-      <div className="bg-flow-gradient px-6 pb-8 pt-10 text-white">
+      <div className="bg-flow-hero px-6 pb-8 pt-10">
         <div className="mx-auto flex max-w-sm items-center gap-3">
           {card.logo_url ? (
-            <img src={card.logo_url} alt={card.business_name} className="h-12 w-12 rounded-2xl object-cover shadow-lg" />
+            <img src={card.logo_url} alt={card.business_name} className="h-12 w-12 rounded-lg object-cover" />
           ) : (
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/15 font-display text-lg font-bold">
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-secondary/25 font-display text-lg font-semibold text-foreground">
               {card.business_name.charAt(0).toUpperCase()}
             </div>
           )}
-          <h1 className="font-display text-lg font-bold">{card.business_name}</h1>
+          <h1 className="font-display text-lg font-semibold text-foreground">{card.business_name}</h1>
         </div>
-        <p className="mx-auto mt-4 max-w-sm font-display text-3xl font-extrabold">
-          {card.current_stamps} of {required} Stamps
+        <p className="mx-auto mt-4 max-w-sm font-display text-3xl font-semibold text-foreground">
+          <span className="text-primary">{card.current_stamps}</span> of {required} Stamps
         </p>
       </div>
 
       <div className="mx-auto -mt-4 flex max-w-sm flex-col gap-4 px-6">
         {redemption && (
-          <div ref={rewardRef} className="flex items-center gap-3 rounded-2xl border-2 border-success/30 bg-success/5 p-4">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-success/15 text-success">
+          <div ref={rewardRef} className="flex items-center gap-3 rounded-xl border border-primary/40 bg-primary/5 p-4">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-primary">
               <PartyPopper className="h-5 w-5" />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="font-semibold">{card.reward_description}</p>
+              <p className="font-semibold text-foreground">{card.reward_description}</p>
               <p className="text-xs text-muted-foreground">Show this code to staff to redeem</p>
             </div>
-            <span className="shrink-0 font-mono text-lg font-extrabold tracking-wider text-success">
+            <span className="shrink-0 font-display text-lg font-semibold tracking-wider text-primary">
               {redemption.redemption_code}
             </span>
           </div>
         )}
 
-        <div className="rounded-3xl border border-border bg-card p-5 shadow-xl">
+        <div className="rounded-xl border border-border bg-card p-5">
           <p className="mb-4 text-sm text-muted-foreground">
             {redemption
               ? 'Your reward is ready to claim above.'
@@ -241,7 +243,7 @@ export default function BusinessPage() {
         </div>
 
         {!redemption && card.collection_deadline_at && (
-          <div className="flex items-center gap-2 rounded-2xl border border-amber-500/25 bg-amber-500/5 px-4 py-3 text-sm font-medium text-amber-600">
+          <div className="flex items-center gap-2 rounded-lg border border-amber-400/25 bg-amber-400/10 px-4 py-3 text-sm font-medium text-amber-300">
             <Hourglass className="h-4 w-4 shrink-0" />
             {(() => {
               const days = Math.ceil((new Date(card.collection_deadline_at).getTime() - Date.now()) / 86400000)
@@ -254,7 +256,7 @@ export default function BusinessPage() {
 
         {!redemption &&
           (pendingStamp ? (
-            <div className="flex items-center justify-center gap-2 rounded-2xl border border-primary/20 bg-primary/5 px-4 py-3.5 text-sm font-semibold text-primary">
+            <div className="flex items-center justify-center gap-2 rounded-lg border border-primary/25 bg-primary/5 px-4 py-3.5 text-sm font-semibold text-primary">
               <Clock className="h-4 w-4 animate-pulse" />
               Waiting for staff to approve…
             </div>
@@ -277,14 +279,14 @@ export default function BusinessPage() {
           <button
             type="button"
             onClick={shareReferral}
-            className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-card p-4 text-left shadow-sm transition-colors hover:bg-muted"
+            className="flex items-center justify-between gap-3 rounded-lg border border-border bg-card p-4 text-left transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-primary">
                 <Users className="h-5 w-5" />
               </div>
               <div>
-                <p className="font-semibold">Refer a friend</p>
+                <p className="font-semibold text-foreground">Refer a friend</p>
                 <p className="text-xs text-muted-foreground">You both get a bonus stamp when they join</p>
               </div>
             </div>
@@ -297,14 +299,14 @@ export default function BusinessPage() {
         {hasMenu && (
           <Link
             to={`/menu/${slug}`}
-            className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-card p-4 shadow-sm transition-colors hover:bg-muted"
+            className="flex items-center justify-between gap-3 rounded-lg border border-border bg-card p-4 transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-success/10 text-success">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-secondary/20 text-secondary-foreground">
                 <UtensilsCrossed className="h-5 w-5" />
               </div>
               <div>
-                <p className="font-semibold">View Menu</p>
+                <p className="font-semibold text-foreground">View Menu</p>
                 <p className="text-xs text-muted-foreground">See what's on offer</p>
               </div>
             </div>
@@ -313,12 +315,12 @@ export default function BusinessPage() {
         )}
 
         {(businessInfo?.phone || businessInfo?.address) && (
-          <div className="rounded-2xl border border-border bg-card shadow-sm">
+          <div className="rounded-lg border border-border bg-card">
             <p className="px-4 pt-3 text-xs font-bold uppercase tracking-wide text-muted-foreground">Business info</p>
             {businessInfo.address && (
               <div className="flex items-center gap-3 p-4">
                 <MapPin className="h-4.5 w-4.5 shrink-0 text-muted-foreground" />
-                <p className="text-sm">{businessInfo.address}</p>
+                <p className="text-sm text-foreground">{businessInfo.address}</p>
               </div>
             )}
             {businessInfo.phone && (
@@ -327,7 +329,7 @@ export default function BusinessPage() {
                 className="flex items-center gap-3 border-t border-border p-4 transition-colors hover:bg-muted"
               >
                 <Phone className="h-4.5 w-4.5 shrink-0 text-muted-foreground" />
-                <p className="text-sm font-semibold">{businessInfo.phone}</p>
+                <p className="text-sm font-semibold text-foreground">{businessInfo.phone}</p>
               </a>
             )}
           </div>

@@ -24,13 +24,13 @@ export function EngagementPrompts({ membershipId, googleReviewUrl, instagramHand
       {googleReviewUrl && (
         <button
           onClick={() => handleClick('google_review', googleReviewUrl)}
-          className="flex cursor-pointer items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3.5 text-left transition-colors hover:bg-muted active:scale-[0.98]"
+          className="flex cursor-pointer items-center gap-3 rounded-lg border border-border bg-card px-4 py-3.5 text-left transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.98]"
         >
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-400/15 text-amber-500">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-400/15 text-amber-300">
             <Star className="h-4.5 w-4.5" fill="currentColor" />
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-semibold">Leave a Google review</p>
+            <p className="text-sm font-semibold text-foreground">Leave a Google review</p>
             <p className="text-xs text-muted-foreground">Help others discover this place</p>
           </div>
         </button>
@@ -38,13 +38,13 @@ export function EngagementPrompts({ membershipId, googleReviewUrl, instagramHand
       {instagramUrl && (
         <button
           onClick={() => handleClick('instagram_follow', instagramUrl)}
-          className="flex cursor-pointer items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3.5 text-left transition-colors hover:bg-muted active:scale-[0.98]"
+          className="flex cursor-pointer items-center gap-3 rounded-lg border border-border bg-card px-4 py-3.5 text-left transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.98]"
         >
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-flow-gradient-soft text-secondary">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-secondary/20 text-secondary-foreground">
             <Instagram className="h-4.5 w-4.5" />
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-semibold">Follow on Instagram</p>
+            <p className="text-sm font-semibold text-foreground">Follow on Instagram</p>
             <p className="text-xs text-muted-foreground">{instagramHandle}</p>
           </div>
         </button>

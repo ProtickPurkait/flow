@@ -182,9 +182,9 @@ export default function DashboardHome() {
 
   const statCards = [
     { label: 'Scans Today', value: stats?.scans_today ?? 0, icon: Zap, tone: 'text-success bg-success/10' },
-    { label: 'Users', value: stats?.total_customers ?? 0, icon: Users, tone: 'text-primary bg-primary/10' },
-    { label: 'Rewards', value: stats?.rewards_redeemed ?? 0, icon: Gift, tone: 'text-secondary bg-secondary/10' },
-    { label: 'Repeat', value: `${stats?.repeat_rate ?? 0}%`, icon: Trophy, tone: 'text-amber-600 bg-amber-500/10' },
+    { label: 'Users', value: stats?.total_customers ?? 0, icon: Users, tone: 'text-primary bg-primary/15' },
+    { label: 'Rewards', value: stats?.rewards_redeemed ?? 0, icon: Gift, tone: 'text-secondary-foreground bg-secondary/20' },
+    { label: 'Repeat', value: `${stats?.repeat_rate ?? 0}%`, icon: Trophy, tone: 'text-amber-300 bg-amber-400/10' },
   ]
 
   return (
@@ -193,10 +193,10 @@ export default function DashboardHome() {
         {statCards.map((s) => (
           <Card key={s.label}>
             <CardContent className="flex flex-col items-center gap-1.5 p-4 text-center">
-              <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${s.tone}`}>
+              <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${s.tone}`}>
                 <s.icon className="h-4.5 w-4.5" />
               </div>
-              <p className="font-display text-xl font-bold leading-none">{s.value}</p>
+              <p className="text-xl font-semibold leading-none text-foreground">{s.value}</p>
               <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">{s.label}</p>
             </CardContent>
           </Card>
@@ -204,7 +204,7 @@ export default function DashboardHome() {
       </div>
 
       <div>
-        <h2 className="mb-3 font-display text-lg font-bold">Pending approvals</h2>
+        <h2 className="mb-3 text-lg font-semibold text-foreground">Pending approvals</h2>
         {pending.length === 0 ? (
           <Card>
             <CardContent className="flex flex-col items-center gap-2 py-10 text-center">
@@ -225,7 +225,7 @@ export default function DashboardHome() {
                   <CardContent className="flex flex-col gap-3 p-4">
                     <div className="flex items-center justify-between gap-4">
                       <div className="min-w-0">
-                        <p className="truncate font-semibold">{p.customer_name || p.customer_phone}</p>
+                        <p className="truncate font-semibold text-foreground">{p.customer_name || p.customer_phone}</p>
                         <p className="text-xs text-muted-foreground">
                           {p.current_stamps}
                           {p.stamps_required ? ` / ${p.stamps_required}` : ''} stamps &middot; requested{' '}
@@ -274,19 +274,19 @@ export default function DashboardHome() {
 
       {redemptions.length > 0 && (
         <div>
-          <h2 className="mb-3 font-display text-lg font-bold">Ready to redeem</h2>
+          <h2 className="mb-3 text-lg font-semibold text-foreground">Ready to redeem</h2>
           <div className="flex flex-col gap-3">
             {redemptions.map((r) => (
-              <Card key={r.redemption_id} className="border-success/30">
+              <Card key={r.redemption_id} className="border-primary/30">
                 <CardContent className="flex items-center justify-between gap-4 p-4">
                   <div className="flex min-w-0 items-center gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-success/10 text-success">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-primary">
                       <Gift className="h-5 w-5" />
                     </div>
                     <div className="min-w-0">
-                      <p className="truncate font-semibold">{r.customer_name || r.customer_phone}</p>
+                      <p className="truncate font-semibold text-foreground">{r.customer_name || r.customer_phone}</p>
                       <p className="text-xs text-muted-foreground">
-                        Code <span className="font-mono font-semibold text-foreground">{r.redemption_code}</span>
+                        Code <span className="font-mono font-semibold text-primary">{r.redemption_code}</span>
                       </p>
                     </div>
                   </div>
@@ -303,15 +303,15 @@ export default function DashboardHome() {
 
       <Card>
         <CardContent className="flex flex-col items-center gap-3 p-5">
-          <p className="self-start font-display text-lg font-bold">Your QR Code</p>
+          <p className="self-start text-lg font-semibold text-foreground">Your QR Code</p>
           {qrDataUrl ? (
-            <img src={qrDataUrl} alt="QR code" className="h-44 w-44 rounded-xl border border-border" />
+            <img src={qrDataUrl} alt="QR code" className="h-44 w-44 rounded-lg border border-border" />
           ) : (
-            <div className="flex h-44 w-44 items-center justify-center rounded-xl border border-border">
+            <div className="flex h-44 w-44 items-center justify-center rounded-lg border border-border">
               <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
             </div>
           )}
-          <p className="font-display text-base font-bold">{business.name}</p>
+          <p className="text-base font-semibold text-foreground">{business.name}</p>
           <p className="text-xs text-muted-foreground">Scan to collect rewards</p>
           <div className="flex w-full gap-2">
             <Button variant="outline" className="flex-1" onClick={copyLink}>
@@ -329,21 +329,21 @@ export default function DashboardHome() {
       <Card>
         <CardContent className="p-5">
           <div className="mb-3 flex items-center justify-between">
-            <p className="font-display text-lg font-bold">Reward Programs</p>
+            <p className="text-lg font-semibold text-foreground">Reward Programs</p>
             <Link to="/dashboard/offers/stamp-card" className="text-xs font-semibold text-primary">
               Edit
             </Link>
           </div>
           {program ? (
-            <div className="flex items-center gap-3 rounded-xl bg-muted/50 p-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-secondary/10 text-secondary">
+            <div className="flex items-center gap-3 rounded-lg bg-muted/50 p-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-secondary/20 text-secondary-foreground">
                 <Gift className="h-5 w-5" />
               </div>
               <div className="min-w-0">
-                <p className="text-xs font-bold uppercase tracking-wide text-secondary">
+                <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
                   {program.stamps_required} stamps
                 </p>
-                <p className="truncate text-sm font-medium">{program.reward_description}</p>
+                <p className="truncate text-sm font-medium text-foreground">{program.reward_description}</p>
               </div>
             </div>
           ) : (
@@ -355,8 +355,8 @@ export default function DashboardHome() {
       <Card>
         <CardContent className="p-5">
           <div className="mb-1 flex items-center justify-between">
-            <p className="font-display text-base font-bold">Weekly Scans</p>
-            <p className="font-display text-xl font-bold text-primary">
+            <p className="text-base font-semibold text-foreground">Weekly Scans</p>
+            <p className="text-xl font-semibold text-primary">
               {weeklyScans.reduce((sum, d) => sum + (d.scans ?? 0), 0)}
             </p>
           </div>
@@ -368,8 +368,8 @@ export default function DashboardHome() {
       <Card>
         <CardContent className="p-5">
           <div className="mb-1 flex items-center justify-between">
-            <p className="font-display text-base font-bold">Customer Growth</p>
-            <p className="font-display text-xl font-bold text-primary">
+            <p className="text-base font-semibold text-foreground">Customer Growth</p>
+            <p className="text-xl font-semibold text-primary">
               {growth[growth.length - 1]?.total_customers ?? 0}
             </p>
           </div>

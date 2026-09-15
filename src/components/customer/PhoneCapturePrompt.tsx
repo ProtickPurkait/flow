@@ -2,9 +2,9 @@ import * as React from 'react'
 import { Link } from 'react-router-dom'
 import { Loader2, ArrowRight, ChevronLeft, Gift, Store, Building2, ScanLine, Stamp } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
+import { FormField } from '@/components/ui/form-field'
 import { FlowLogo } from '@/components/brand/FlowLogo'
-import { cn } from '@/lib/utils'
 import { registerCustomer } from '@/lib/customer'
 
 export interface BusinessPreview {
@@ -22,9 +22,9 @@ interface PhoneCapturePromptProps {
 }
 
 const HOW_IT_WORKS = [
-  { icon: ScanLine, label: 'Scan the QR at the counter' },
-  { icon: Stamp, label: 'Collect a stamp every visit' },
-  { icon: Gift, label: 'Unlock your reward' },
+  { icon: ScanLine, label: 'Scan the QR at the counter', gold: false },
+  { icon: Stamp, label: 'Collect a stamp every visit', gold: false },
+  { icon: Gift, label: 'Unlock your reward', gold: true },
 ]
 
 export function PhoneCapturePrompt({
@@ -54,7 +54,7 @@ export function PhoneCapturePrompt({
 
   if (step === 'intro') {
     return (
-      <div className="flex min-h-screen flex-col bg-flow-aurora px-6 pt-16">
+      <div className="flex min-h-screen flex-col bg-background px-6 pt-16">
         <div className="mx-auto w-full max-w-sm">
           {businessPreview ? (
             <div className="mb-5 flex items-center gap-3">
@@ -62,10 +62,10 @@ export function PhoneCapturePrompt({
                 <img
                   src={businessPreview.logoUrl}
                   alt={businessPreview.name}
-                  className="h-12 w-12 rounded-2xl object-cover shadow-sm"
+                  className="h-12 w-12 rounded-xl object-cover"
                 />
               ) : (
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 font-bold text-primary">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-secondary/20 font-semibold text-secondary-foreground">
                   {businessPreview.name.charAt(0).toUpperCase()}
                 </div>
               )}
@@ -74,11 +74,17 @@ export function PhoneCapturePrompt({
               </p>
             </div>
           ) : (
-            <Gift className="mb-3 h-8 w-8 text-secondary" />
+            <Gift className="mb-3 h-8 w-8 text-primary" />
           )}
 
-          <h1 className="mb-3 text-3xl font-bold leading-tight tracking-tight text-foreground">
-            {businessPreview ? 'Collect stamps. Unlock rewards.' : title}
+          <h1 className="mb-3 font-display text-3xl font-semibold leading-tight tracking-tight text-foreground">
+            {businessPreview ? (
+              'Collect stamps. Unlock rewards.'
+            ) : (
+              <>
+                Start collecting <span className="text-primary">rewards!</span>
+              </>
+            )}
           </h1>
 
           {businessPreview?.stampsRequired && businessPreview.rewardDescription ? (
@@ -91,15 +97,18 @@ export function PhoneCapturePrompt({
           )}
 
           <div className="mb-8 flex flex-col gap-3">
-            {HOW_IT_WORKS.map((item, i) => (
-              <div key={item.label} className="flex items-center gap-3 rounded-2xl border border-border bg-card/70 p-3.5">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            {HOW_IT_WORKS.map((item) => (
+              <div key={item.label} className="flex items-center gap-3 rounded-lg border border-border bg-card p-3.5">
+                <div
+                  className={
+                    item.gold
+                      ? 'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-primary'
+                      : 'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-secondary/20 text-secondary-foreground'
+                  }
+                >
                   <item.icon className="h-4.5 w-4.5" />
                 </div>
-                <p className="text-sm font-medium text-foreground">
-                  <span className="mr-1.5 text-muted-foreground">{i + 1}.</span>
-                  {item.label}
-                </p>
+                <p className="text-sm font-medium text-foreground">{item.label}</p>
               </div>
             ))}
           </div>
@@ -110,14 +119,14 @@ export function PhoneCapturePrompt({
           </Button>
 
           <div className="flex justify-center">
-            <div className="inline-flex rounded-full bg-muted p-1 shadow-inner">
-              <span className="flex items-center gap-2 rounded-full bg-card px-5 py-2.5 text-sm font-medium text-foreground shadow-sm">
+            <div className="inline-flex rounded-full border border-border bg-card p-1">
+              <span className="flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground">
                 <Store className="h-4 w-4" />
                 Customer
               </span>
               <Link
                 to="/login"
-                className="flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium text-muted-foreground transition-all duration-300 hover:text-foreground"
+                className="flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
               >
                 <Building2 className="h-4 w-4" />
                 Business
@@ -130,7 +139,7 @@ export function PhoneCapturePrompt({
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-flow-aurora px-6 pt-16">
+    <div className="flex min-h-screen flex-col bg-background px-6 pt-16">
       <div className="mx-auto w-full max-w-sm">
         <button
           type="button"
@@ -141,23 +150,15 @@ export function PhoneCapturePrompt({
           Back
         </button>
 
-        <h1 className="mb-3 text-3xl font-bold leading-tight tracking-tight text-foreground">
+        <h1 className="mb-3 font-display text-3xl font-semibold leading-tight tracking-tight text-foreground">
           {businessPreview ? `Join ${businessPreview.name}` : title}
         </h1>
         <p className="mb-8 text-base text-muted-foreground">{description}</p>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="phone" className="text-sm font-medium text-foreground">
-              Mobile Number
-            </Label>
-            <div
-              className={cn(
-                'flex h-14 items-center rounded-2xl border border-transparent bg-muted/60 transition-colors',
-                'focus-within:border-primary focus-within:bg-card'
-              )}
-            >
-              <span className="pl-4 pr-2 text-lg font-medium text-foreground/70">+91</span>
+          <FormField label="Mobile Number" htmlFor="phone">
+            <div className="flex h-14 items-center rounded-xl border border-border bg-input transition-colors focus-within:border-primary focus-within:ring-1 focus-within:ring-primary">
+              <span className="pl-4 pr-2 text-lg font-medium text-muted-foreground">+91</span>
               <input
                 id="phone"
                 type="tel"
@@ -167,25 +168,22 @@ export function PhoneCapturePrompt({
                 placeholder="9876543210"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="h-full flex-1 rounded-r-2xl bg-transparent pr-4 text-lg tracking-wider text-foreground outline-none placeholder:text-muted-foreground"
+                className="h-full flex-1 rounded-r-xl bg-transparent pr-4 text-lg tracking-wider text-foreground outline-none placeholder:text-muted-foreground"
               />
             </div>
-          </div>
+          </FormField>
 
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="name" className="text-sm font-medium text-foreground">
-              Name
-            </Label>
-            <input
+          <FormField label="Name" htmlFor="name">
+            <Input
               id="name"
               autoComplete="name"
               required
               placeholder="Your name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="h-14 w-full rounded-2xl border border-transparent bg-muted/60 px-4 text-lg text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:bg-card"
+              className="h-14 text-lg"
             />
-          </div>
+          </FormField>
 
           {error && <p className="text-sm font-medium text-destructive">{error}</p>}
 

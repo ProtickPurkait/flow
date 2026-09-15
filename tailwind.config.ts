@@ -48,22 +48,25 @@ export default {
       },
       borderRadius: {
         lg: 'var(--radius)',
-        md: 'calc(var(--radius) - 2px)',
-        sm: 'calc(var(--radius) - 4px)',
+        md: 'calc(var(--radius) - 4px)',
+        sm: 'calc(var(--radius) - 8px)',
         xl: 'calc(var(--radius) + 4px)',
       },
       fontFamily: {
         sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'sans-serif'],
-        display: ['Inter', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'sans-serif'],
+        display: ['"Playfair Display"', 'Georgia', 'serif'],
       },
       backgroundImage: {
         // Simple top-to-bottom page wash (two light tints of the background
         // tone), not a radial blob blend.
         'flow-aurora': 'linear-gradient(to bottom, hsl(var(--background)) 0%, hsl(var(--muted)) 100%)',
-        // Monochromatic vertical gradient (same hue, two lightness stops) --
-        // matches the CTA button treatment, not a two-color diagonal blend.
+        // Gold gradient -- primary CTAs, the scan FAB, filled stamp cells.
+        // Reserved for interactive/reward moments, not full-bleed washes.
         'flow-gradient': 'linear-gradient(180deg, hsl(var(--primary)) 0%, hsl(var(--primary-strong)) 100%)',
         'flow-gradient-soft': 'linear-gradient(180deg, hsl(var(--primary) / 0.1) 0%, hsl(var(--primary-strong) / 0.1) 100%)',
+        // Emerald-to-black hero band -- the two screens that keep a real
+        // header (Home, the loyalty-card page). Deliberately not gold.
+        'flow-hero': 'linear-gradient(160deg, hsl(var(--secondary) / 0.55) 0%, hsl(var(--background)) 75%)',
       },
       keyframes: {
         'accordion-down': { from: { height: '0' }, to: { height: 'var(--radix-accordion-content-height)' } },

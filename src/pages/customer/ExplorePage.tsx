@@ -1,9 +1,13 @@
 import * as React from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Search, Navigation, BadgeCheck, Store, Loader2 } from 'lucide-react'
+import { Search, Navigation, Store, Loader2 } from 'lucide-react'
 import { exploreBusinesses, ensureCustomerSession } from '@/lib/customer'
 import { Input } from '@/components/ui/input'
-import { cn } from '@/lib/utils'
+import { EmptyState } from '@/components/ui/empty-state'
+import { PageHeader } from '@/components/layout/PageHeader'
+import { SectionHeader } from '@/components/layout/SectionHeader'
+import { CategoryChip } from '@/components/customer/CategoryChip'
+import { BusinessCard } from '@/components/customer/BusinessCard'
 import { BUSINESS_CATEGORIES } from '@/lib/categories'
 import type { ExploreBusinessRow } from '@/types/database'
 
@@ -48,17 +52,12 @@ export default function ExplorePage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="bg-flow-gradient px-6 pb-8 pt-8 text-white">
-        <div className="mx-auto max-w-md">
-          <h1 className="font-display text-2xl font-bold">Explore</h1>
-          <p className="text-sm text-white/80">Find new favorites near you</p>
-        </div>
-      </div>
+      <PageHeader title="Explore" subtitle="Find new favorites near you" />
 
-      <div className="mx-auto -mt-4 max-w-md px-4">
+      <div className="mx-auto max-w-md px-4">
         <button
           onClick={useMyLocation}
-          className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl border border-border bg-card px-4 py-3 text-sm font-semibold text-primary shadow-lg"
+          className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-border bg-card px-4 py-3 text-sm font-semibold text-primary transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           {locating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Navigation className="h-4 w-4" />}
           {coords ? 'Using your location' : 'Use my current location'}
@@ -76,65 +75,38 @@ export default function ExplorePage() {
 
         <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
           {CATEGORIES.map((c) => (
-            <button
-              key={c}
-              onClick={() => setCategory(c)}
-              className={cn(
-                'shrink-0 cursor-pointer rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors',
-                category === c
-                  ? 'border-transparent bg-primary text-primary-foreground'
-                  : 'border-border bg-card text-muted-foreground hover:bg-muted'
-              )}
-            >
-              {c}
-            </button>
+            <CategoryChip key={c} label={c} selected={category === c} onClick={() => setCategory(c)} />
           ))}
         </div>
 
-        <h2 className="mb-3 mt-6 text-xs font-bold uppercase tracking-wide text-muted-foreground">
-          {coords ? 'Nearby' : 'Trending'}
-        </h2>
+        <div className="mt-6">
+          <SectionHeader title={coords ? 'Nearby' : 'Trending'} />
+        </div>
 
         {rows === null ? (
           <div className="flex h-40 items-center justify-center">
             <Loader2 className="h-5 w-5 animate-spin text-primary" />
           </div>
         ) : rows.length === 0 ? (
-          <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-border py-12 text-center">
-            <Store className="h-7 w-7 text-muted-foreground" />
-            <p className="font-semibold">No businesses found</p>
-            <p className="text-sm text-muted-foreground">Try a different search or category.</p>
-          </div>
+          <EmptyState icon={Store} title="No businesses found" description="Try a different search or category." />
         ) : (
           <div className="flex flex-col gap-3">
             {rows.map((b) => (
-              <button
+              <BusinessCard
                 key={b.id}
+                name={b.name}
+                logoUrl={b.logo_url}
+                verified={b.is_verified}
+                subtitle={b.reward_description ? `Win: ${b.reward_description}` : b.category || 'Local business'}
                 onClick={() => navigate(`/business/${b.slug}`)}
-                className="flex w-full cursor-pointer items-center gap-3 rounded-2xl border border-border bg-card p-3.5 text-left shadow-sm transition-transform active:scale-[0.98]"
-              >
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-primary/10 font-display font-bold text-primary">
-                  {b.logo_url ? (
-                    <img src={b.logo_url} alt="" className="h-full w-full object-cover" />
-                  ) : (
-                    b.name.charAt(0).toUpperCase()
-                  )}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-1">
-                    <p className="truncate font-semibold">{b.name}</p>
-                    {b.is_verified && <BadgeCheck className="h-4 w-4 shrink-0 text-primary" />}
-                  </div>
-                  <p className="truncate text-sm text-muted-foreground">
-                    {b.reward_description ? `Win: ${b.reward_description}` : b.category || 'Local business'}
-                  </p>
-                </div>
-                {b.distance_km != null && (
-                  <span className="shrink-0 text-xs font-semibold text-muted-foreground">
-                    {b.distance_km < 1 ? `${Math.round(b.distance_km * 1000)}m` : `${b.distance_km.toFixed(1)}km`}
-                  </span>
-                )}
-              </button>
+                trailing={
+                  b.distance_km != null && (
+                    <span className="shrink-0 text-xs font-semibold text-muted-foreground">
+                      {b.distance_km < 1 ? `${Math.round(b.distance_km * 1000)}m` : `${b.distance_km.toFixed(1)}km`}
+                    </span>
+                  )
+                }
+              />
             ))}
           </div>
         )}

@@ -219,7 +219,7 @@ export default function SettingsPage() {
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <h1 className="font-display text-xl font-bold">Profile &amp; Settings</h1>
+        <h1 className="text-xl font-semibold text-foreground">Profile &amp; Settings</h1>
         <p className="text-sm text-muted-foreground">Manage your business and account</p>
       </div>
 
@@ -233,7 +233,7 @@ export default function SettingsPage() {
             )}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="truncate font-display text-lg font-bold">{business.name}</p>
+            <p className="truncate text-lg font-semibold text-foreground">{business.name}</p>
             <p className="text-sm text-muted-foreground">{business.category || 'No category set'}</p>
           </div>
           <Button size="sm" variant="outline" onClick={() => setOpenSection('identity')}>
@@ -259,7 +259,7 @@ export default function SettingsPage() {
       />
       <SettingsRow
         icon={Instagram}
-        tone="text-secondary bg-secondary/10"
+        tone="text-secondary-foreground bg-secondary/20"
         title="Social Links & Reviews"
         subtitle="Manage your online presence"
         onEdit={() => setOpenSection('social')}
@@ -296,11 +296,11 @@ export default function SettingsPage() {
       <Card>
         <CardContent className="flex items-center justify-between gap-3 p-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-400/10 text-amber-300">
               <RefreshCw className="h-5 w-5" />
             </div>
             <div>
-              <p className="font-semibold">Allow Multiple Scans</p>
+              <p className="font-semibold text-foreground">Allow Multiple Scans</p>
               <p className="text-xs text-muted-foreground">Customers can scan multiple times a day</p>
             </div>
           </div>

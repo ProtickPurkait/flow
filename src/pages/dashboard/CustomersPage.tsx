@@ -105,16 +105,16 @@ export default function CustomersPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="font-display text-xl font-bold">Customers</h1>
+      <h1 className="text-xl font-semibold text-foreground">Customers</h1>
 
       <Card>
         <CardContent className="flex items-center justify-between gap-3 p-4">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-secondary/10 text-secondary">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-secondary/20 text-secondary-foreground">
               <MessageCircle className="h-4 w-4" />
             </div>
             <div>
-              <p className="font-semibold">Message your customers</p>
+              <p className="font-semibold text-foreground">Message your customers</p>
               <p className="text-xs text-muted-foreground">Send a promo over WhatsApp to everyone on your card</p>
             </div>
           </div>
@@ -153,7 +153,7 @@ export default function CustomersPage() {
             onClick={() => setStatus(s)}
             className={cn(
               'cursor-pointer rounded-full px-4 py-2 text-sm font-semibold capitalize transition-colors',
-              status === s ? 'bg-flow-gradient text-white shadow-md' : 'bg-muted text-muted-foreground hover:text-foreground'
+              status === s ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:text-foreground'
             )}
           >
             {s}
@@ -181,7 +181,7 @@ export default function CustomersPage() {
               <Card key={r.customer_id}>
                 <CardContent className="flex items-center justify-between gap-3 p-4">
                   <div className="min-w-0">
-                    <p className="truncate font-semibold">{r.name || r.phone}</p>
+                    <p className="truncate font-semibold text-foreground">{r.name || r.phone}</p>
                     <p className="text-xs text-muted-foreground">
                       {r.phone} &middot; {r.current_stamps}
                       {r.stamps_required ? `/${r.stamps_required}` : ''} stamps
@@ -190,7 +190,7 @@ export default function CustomersPage() {
                   </div>
                   <div className="flex shrink-0 flex-col items-end gap-1">
                     {left != null && (
-                      <span className="flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-0.5 text-[11px] font-semibold text-amber-600">
+                      <span className="flex items-center gap-1 rounded-full bg-amber-400/10 px-2 py-0.5 text-[11px] font-semibold text-amber-300">
                         <Hourglass className="h-3 w-3" />
                         {left > 0 ? `${left}d left` : 'expiring'}
                       </span>

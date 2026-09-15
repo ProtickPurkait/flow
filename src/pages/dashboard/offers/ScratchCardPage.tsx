@@ -101,7 +101,7 @@ export default function ScratchCardPage() {
 
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display text-xl font-bold">Scratch Cards</h1>
+          <h1 className="text-xl font-semibold text-foreground">Scratch Cards</h1>
           <p className="text-sm text-muted-foreground">Give random gifts to visitors.</p>
         </div>
         <Button size="sm" variant="outline" disabled={adding} onClick={addPrize}>
@@ -144,8 +144,8 @@ export default function ScratchCardPage() {
                   </div>
                 </div>
 
-                <div className="rounded-xl bg-amber-500/5 p-3">
-                  <p className="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-amber-600">
+                <div className="rounded-lg bg-amber-400/5 p-3">
+                  <p className="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-amber-300">
                     <Dices className="h-3.5 w-3.5" />
                     Winning odds
                   </p>
@@ -153,15 +153,15 @@ export default function ScratchCardPage() {
                     <button
                       type="button"
                       onClick={() => updatePrize(p.id, { win_numerator: Math.max(1, p.win_numerator - 1) })}
-                      className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-full bg-muted"
+                      className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-full bg-muted text-foreground"
                     >
                       <Minus className="h-3.5 w-3.5" />
                     </button>
-                    <span className="w-5 text-center font-bold">{p.win_numerator}</span>
+                    <span className="w-5 text-center font-bold text-foreground">{p.win_numerator}</span>
                     <button
                       type="button"
                       onClick={() => updatePrize(p.id, { win_numerator: p.win_numerator + 1 })}
-                      className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-full bg-amber-500 text-white"
+                      className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-full bg-primary text-primary-foreground"
                     >
                       <Plus className="h-3.5 w-3.5" />
                     </button>
@@ -169,15 +169,15 @@ export default function ScratchCardPage() {
                     <button
                       type="button"
                       onClick={() => updatePrize(p.id, { win_denominator: Math.max(p.win_numerator, p.win_denominator - 1) })}
-                      className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-full bg-muted"
+                      className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-full bg-muted text-foreground"
                     >
                       <Minus className="h-3.5 w-3.5" />
                     </button>
-                    <span className="w-5 text-center font-bold">{p.win_denominator}</span>
+                    <span className="w-5 text-center font-bold text-foreground">{p.win_denominator}</span>
                     <button
                       type="button"
                       onClick={() => updatePrize(p.id, { win_denominator: p.win_denominator + 1 })}
-                      className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-full bg-amber-500 text-white"
+                      className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-full bg-primary text-primary-foreground"
                     >
                       <Plus className="h-3.5 w-3.5" />
                     </button>

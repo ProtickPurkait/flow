@@ -1,19 +1,17 @@
 import * as React from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Loader2, Phone, Mail, Cake, Moon, LogOut, Pencil, Check, User as UserIcon, ShieldCheck, LifeBuoy, ChevronRight } from 'lucide-react'
+import { Loader2, Phone, Mail, Cake, LogOut, Pencil, Check, User as UserIcon, ShieldCheck, LifeBuoy, ChevronRight } from 'lucide-react'
 import { useCustomerAccount } from '@/hooks/useCustomerAccount'
 import { getMyProfile, updateMyProfile, signOutCustomer } from '@/lib/customer'
-import { useDarkMode } from '@/hooks/useDarkMode'
 import { useToast } from '@/hooks/use-toast'
 import { PhoneCapturePrompt } from '@/components/customer/PhoneCapturePrompt'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Switch } from '@/components/ui/switch'
+import { SectionHeader } from '@/components/layout/SectionHeader'
 import type { CustomerProfile } from '@/types/database'
 
 export default function ProfilePage() {
   const { loading, registered, refresh } = useCustomerAccount()
-  const { isDark, toggle } = useDarkMode()
   const { toast } = useToast()
   const navigate = useNavigate()
 
@@ -69,9 +67,9 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="bg-flow-gradient px-6 pb-10 pt-8 text-center text-white">
-        <h1 className="font-display text-2xl font-bold">My Profile</h1>
-        <div className="mx-auto mt-4 flex h-20 w-20 items-center justify-center rounded-full bg-white/15">
+      <div className="bg-flow-hero px-6 pb-10 pt-8 text-center">
+        <h1 className="font-display text-2xl font-semibold text-foreground">My Profile</h1>
+        <div className="mx-auto mt-4 flex h-20 w-20 items-center justify-center rounded-full border border-primary/30 bg-secondary/20 text-foreground">
           <UserIcon className="h-9 w-9" />
         </div>
 
@@ -81,20 +79,20 @@ export default function ProfilePage() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Your name"
-              className="border-white/30 bg-white/10 text-center text-white placeholder:text-white/50"
+              className="text-center"
             />
           </div>
         ) : (
           <div className="mt-3 flex items-center justify-center gap-1.5">
-            <p className="font-display text-lg font-bold">{profile?.name || 'Add your name'}</p>
-            <button onClick={() => setEditing(true)} className="cursor-pointer text-white/70" aria-label="Edit name">
+            <p className="font-display text-lg font-semibold text-foreground">{profile?.name || 'Add your name'}</p>
+            <button onClick={() => setEditing(true)} className="cursor-pointer text-muted-foreground hover:text-primary" aria-label="Edit name">
               <Pencil className="h-3.5 w-3.5" />
             </button>
           </div>
         )}
 
         {editing && (
-          <Button size="sm" variant="secondary" className="mt-3" disabled={saving} onClick={handleSave}>
+          <Button size="sm" className="mt-3" disabled={saving} onClick={handleSave}>
             {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
             Save
           </Button>
@@ -102,18 +100,19 @@ export default function ProfilePage() {
       </div>
 
       <div className="mx-auto -mt-4 max-w-md px-4">
-        <div className="rounded-2xl border border-border bg-card shadow-lg">
+        <SectionHeader title="Personal Information" />
+        <div className="rounded-lg border border-border bg-card">
           <div className="flex items-center gap-3 p-4">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-primary">
               <Phone className="h-4.5 w-4.5" />
             </div>
             <div className="min-w-0">
               <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Phone number</p>
-              <p className="font-semibold">{profile?.phone}</p>
+              <p className="font-semibold text-foreground">{profile?.phone}</p>
             </div>
           </div>
           <div className="flex items-center gap-3 border-t border-border p-4">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-secondary/10 text-secondary">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-secondary/20 text-secondary-foreground">
               <Mail className="h-4.5 w-4.5" />
             </div>
             <div className="min-w-0 flex-1">
@@ -126,14 +125,14 @@ export default function ProfilePage() {
                   className="mt-1 h-9"
                 />
               ) : (
-                <p className={profile?.email ? 'font-semibold' : 'italic text-muted-foreground'}>
+                <p className={profile?.email ? 'font-semibold text-foreground' : 'italic text-muted-foreground'}>
                   {profile?.email || 'Not set'}
                 </p>
               )}
             </div>
           </div>
           <div className="flex items-center gap-3 border-t border-border p-4">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-primary">
               <Cake className="h-4.5 w-4.5" />
             </div>
             <div className="min-w-0 flex-1">
@@ -141,7 +140,7 @@ export default function ProfilePage() {
               {editing ? (
                 <Input type="date" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} className="mt-1 h-9" />
               ) : (
-                <p className={profile?.date_of_birth ? 'font-semibold' : 'italic text-muted-foreground'}>
+                <p className={profile?.date_of_birth ? 'font-semibold text-foreground' : 'italic text-muted-foreground'}>
                   {profile?.date_of_birth
                     ? new Date(profile.date_of_birth).toLocaleDateString(undefined, { month: 'long', day: 'numeric' })
                     : 'Add it for birthday treats from businesses you visit'}
@@ -151,48 +150,43 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        <p className="mb-2 mt-6 text-xs font-bold uppercase tracking-wide text-muted-foreground">App settings</p>
-        <div className="rounded-2xl border border-border bg-card shadow-sm">
-          <div className="flex items-center justify-between p-4">
-            <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
-                <Moon className="h-4 w-4" />
-              </div>
-              <p className="font-semibold">Dark mode</p>
-            </div>
-            <Switch checked={isDark} onCheckedChange={toggle} />
-          </div>
+        <div className="mt-6">
+          <SectionHeader title="Support" />
         </div>
-
-        <p className="mb-2 mt-6 text-xs font-bold uppercase tracking-wide text-muted-foreground">Support</p>
-        <div className="rounded-2xl border border-border bg-card shadow-sm">
+        <div className="rounded-lg border border-border bg-card">
           <Link
             to="/profile/privacy-security"
-            className="flex items-center justify-between gap-3 p-4 transition-colors hover:bg-muted"
+            className="flex items-center justify-between gap-3 p-4 transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <div className="flex items-center gap-3">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
                 <ShieldCheck className="h-4 w-4" />
               </div>
-              <p className="font-semibold">Privacy and Security</p>
+              <div>
+                <p className="font-semibold text-foreground">Privacy and Security</p>
+                <p className="text-xs text-muted-foreground">Your data, our priority</p>
+              </div>
             </div>
             <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
           </Link>
           <Link
             to="/profile/help-support"
-            className="flex items-center justify-between gap-3 border-t border-border p-4 transition-colors hover:bg-muted"
+            className="flex items-center justify-between gap-3 border-t border-border p-4 transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <div className="flex items-center gap-3">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
                 <LifeBuoy className="h-4 w-4" />
               </div>
-              <p className="font-semibold">Help and Support</p>
+              <div>
+                <p className="font-semibold text-foreground">Help and Support</p>
+                <p className="text-xs text-muted-foreground">Get help, contact us</p>
+              </div>
             </div>
             <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
           </Link>
         </div>
 
-        <Button variant="outline" className="mt-6 w-full border-destructive/30 text-destructive hover:bg-destructive/10" onClick={handleSignOut}>
+        <Button variant="ghost" className="mt-6 w-full text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={handleSignOut}>
           <LogOut className="h-4 w-4" />
           Sign out
         </Button>

@@ -5,7 +5,8 @@ import { Loader2, ArrowRight, Compass, ScanLine, Stamp, Gift } from 'lucide-reac
 import { supabase } from '@/lib/supabase'
 import { ensureCustomerSession, isRegistered, registerCustomer, joinBusiness } from '@/lib/customer'
 import { Button } from '@/components/ui/button'
-import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
+import { FormField } from '@/components/ui/form-field'
 import { FlowLogo } from '@/components/brand/FlowLogo'
 import type { Business } from '@/types/database'
 
@@ -117,10 +118,10 @@ export default function EntryPage() {
   if (phase === 'not-found') {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-background px-6 text-center">
-        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
+        <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-secondary/20 text-secondary-foreground">
           <Compass className="h-6 w-6" />
         </div>
-        <h1 className="text-xl font-bold">We couldn't find this place</h1>
+        <h1 className="font-display text-xl font-semibold text-foreground">We couldn't find this place</h1>
         <p className="max-w-xs text-sm text-muted-foreground">
           This QR code may be inactive. Ask staff for a fresh one.
         </p>
@@ -129,18 +130,20 @@ export default function EntryPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-flow-aurora px-6 pt-16">
+    <div className="flex min-h-screen flex-col bg-background px-6 pt-16">
       <div ref={heroRef} className="mx-auto w-full max-w-sm">
         <div className="mb-6 flex items-center gap-3">
           {business?.logo_url && (
-            <img src={business.logo_url} alt={business.name} className="h-11 w-11 rounded-2xl object-cover shadow-sm" />
+            <img src={business.logo_url} alt={business.name} className="h-11 w-11 rounded-xl object-cover" />
           )}
           <p className="text-sm font-medium text-muted-foreground">
             Welcome to <span className="font-semibold text-foreground">{business?.name}</span>
           </p>
         </div>
 
-        <h1 className="mb-3 text-3xl font-bold leading-tight tracking-tight text-foreground">Start collecting stamps!</h1>
+        <h1 className="mb-3 font-display text-3xl font-semibold leading-tight tracking-tight text-foreground">
+          Start collecting <span className="text-primary">stamps!</span>
+        </h1>
         {program ? (
           <p className="mb-6 text-base text-muted-foreground">
             Collect <span className="font-semibold text-foreground">{program.stamps_required} stamps</span> to
@@ -152,15 +155,21 @@ export default function EntryPage() {
           </p>
         )}
 
-        <div className="mb-8 flex items-center justify-between gap-2 rounded-2xl border border-border bg-card/70 p-3.5">
+        <div className="mb-8 flex items-center justify-between gap-2 rounded-lg border border-border bg-card p-3.5">
           {[
-            { icon: ScanLine, label: 'Scan' },
-            { icon: Stamp, label: 'Collect' },
-            { icon: Gift, label: 'Unlock' },
+            { icon: ScanLine, label: 'Scan', gold: false },
+            { icon: Stamp, label: 'Collect', gold: false },
+            { icon: Gift, label: 'Unlock', gold: true },
           ].map((step, i, arr) => (
             <React.Fragment key={step.label}>
               <div className="flex flex-1 flex-col items-center gap-1.5 text-center">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <div
+                  className={
+                    step.gold
+                      ? 'flex h-9 w-9 items-center justify-center rounded-lg bg-primary/15 text-primary'
+                      : 'flex h-9 w-9 items-center justify-center rounded-lg bg-secondary/20 text-secondary-foreground'
+                  }
+                >
                   <step.icon className="h-4.5 w-4.5" />
                 </div>
                 <p className="text-xs font-medium text-foreground">{step.label}</p>
@@ -171,12 +180,9 @@ export default function EntryPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="phone" className="text-sm font-medium text-foreground">
-              Mobile Number
-            </Label>
-            <div className="flex h-14 items-center rounded-2xl border border-transparent bg-muted/60 transition-colors focus-within:border-primary focus-within:bg-card">
-              <span className="pl-4 pr-2 text-lg font-medium text-foreground/70">+91</span>
+          <FormField label="Mobile Number" htmlFor="phone">
+            <div className="flex h-14 items-center rounded-xl border border-border bg-input transition-colors focus-within:border-primary focus-within:ring-1 focus-within:ring-primary">
+              <span className="pl-4 pr-2 text-lg font-medium text-muted-foreground">+91</span>
               <input
                 id="phone"
                 type="tel"
@@ -186,24 +192,21 @@ export default function EntryPage() {
                 placeholder="9876543210"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="h-full flex-1 rounded-r-2xl bg-transparent pr-4 text-lg tracking-wider text-foreground outline-none placeholder:text-muted-foreground"
+                className="h-full flex-1 rounded-r-xl bg-transparent pr-4 text-lg tracking-wider text-foreground outline-none placeholder:text-muted-foreground"
               />
             </div>
-          </div>
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="name" className="text-sm font-medium text-foreground">
-              Name
-            </Label>
-            <input
+          </FormField>
+          <FormField label="Name" htmlFor="name">
+            <Input
               id="name"
               autoComplete="name"
               required
               placeholder="Your name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="h-14 w-full rounded-2xl border border-transparent bg-muted/60 px-4 text-lg text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:bg-card"
+              className="h-14 text-lg"
             />
-          </div>
+          </FormField>
           {error && <p className="text-sm font-medium text-destructive">{error}</p>}
           <Button type="submit" size="lg" disabled={submitting} className="mt-1">
             {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}

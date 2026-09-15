@@ -49,32 +49,34 @@ export default function MenuViewPage() {
   if (!business) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-background px-6 text-center">
-        <UtensilsCrossed className="h-8 w-8 text-muted-foreground" />
-        <p className="font-semibold">We couldn't find this menu</p>
+        <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-secondary/20 text-secondary-foreground">
+          <UtensilsCrossed className="h-6 w-6" />
+        </div>
+        <p className="font-semibold text-foreground">We couldn't find this menu</p>
       </div>
     )
   }
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <div className="bg-flow-gradient px-5 pb-4 pt-6 text-white">
+      <div className="bg-flow-hero px-5 pb-4 pt-6">
         <div className="mx-auto flex max-w-sm items-center gap-3">
           {business.logo_url ? (
             <img src={business.logo_url} alt={business.name} className="h-10 w-10 rounded-full object-cover" />
           ) : (
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 font-display font-bold">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary/25 font-display font-semibold text-foreground">
               {business.name.charAt(0)}
             </div>
           )}
-          <p className="font-display text-lg font-bold">{business.name}</p>
+          <p className="font-display text-lg font-semibold text-foreground">{business.name}</p>
         </div>
         <div className="relative mx-auto mt-4 max-w-sm">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/60" />
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search for dishes..."
-            className="h-11 w-full rounded-xl border border-white/20 bg-white/10 pl-9 pr-4 text-sm text-white outline-none placeholder:text-white/60"
+            className="h-11 w-full rounded-xl border border-border bg-input pl-9 pr-4 text-sm text-foreground outline-none placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary"
           />
         </div>
       </div>
@@ -91,18 +93,18 @@ export default function MenuViewPage() {
             if (catItems.length === 0) return null
             return (
               <div key={cat.id}>
-                <h2 className="mb-3 font-display text-base font-bold">{cat.name}</h2>
+                <h2 className="mb-3 font-display text-base font-semibold text-foreground">{cat.name}</h2>
                 <div className="flex flex-col gap-3">
                   {catItems.map((item) => (
-                    <div key={item.id} className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-card p-3">
+                    <div key={item.id} className="flex items-center justify-between gap-3 rounded-lg border border-border bg-card p-3">
                       {item.image_url && (
-                        <img src={item.image_url} alt={item.name} className="h-14 w-14 shrink-0 rounded-xl object-cover" />
+                        <img src={item.image_url} alt={item.name} className="h-14 w-14 shrink-0 rounded-lg object-cover" />
                       )}
                       <div className="min-w-0 flex-1">
-                        <p className="truncate font-semibold">{item.name}</p>
+                        <p className="truncate font-semibold text-foreground">{item.name}</p>
                         {item.description && <p className="truncate text-xs text-muted-foreground">{item.description}</p>}
                       </div>
-                      {item.price != null && <p className="shrink-0 font-display font-bold text-primary">₹{item.price}</p>}
+                      {item.price != null && <p className="shrink-0 font-display font-semibold text-primary">₹{item.price}</p>}
                     </div>
                   ))}
                 </div>
@@ -116,7 +118,7 @@ export default function MenuViewPage() {
         {business.phone && (
           <a
             href={`tel:${business.phone}`}
-            className="flex items-center gap-2 rounded-full border border-border bg-card px-5 py-2.5 text-sm font-semibold shadow-sm"
+            className="flex items-center gap-2 rounded-full border border-border bg-card px-5 py-2.5 text-sm font-semibold text-foreground"
           >
             <Phone className="h-4 w-4" />
             {business.phone}

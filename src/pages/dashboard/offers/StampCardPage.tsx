@@ -101,7 +101,7 @@ export default function StampCardPage() {
       </Link>
 
       <div className="flex items-center justify-between">
-        <h1 className="font-display text-xl font-bold">Reward Programs</h1>
+        <h1 className="text-xl font-semibold text-foreground">Reward Programs</h1>
         <div className="flex items-center gap-2">
           <span className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
             {active ? 'Active' : 'Inactive'}
@@ -122,11 +122,11 @@ export default function StampCardPage() {
               >
                 <Minus className="h-4 w-4" />
               </button>
-              <span className="w-10 text-center font-display text-lg font-bold">{stampsRequired}</span>
+              <span className="w-10 text-center text-lg font-semibold text-foreground">{stampsRequired}</span>
               <button
                 type="button"
                 onClick={() => setStampsRequired((n) => Math.min(50, n + 1))}
-                className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full bg-primary text-white hover:brightness-105"
+                className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full bg-primary text-primary-foreground hover:brightness-105"
               >
                 <Plus className="h-4 w-4" />
               </button>
@@ -207,7 +207,7 @@ export default function StampCardPage() {
         <CardContent className="flex flex-col gap-4 p-4">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-400/10 text-amber-300">
                 <Cake className="h-4 w-4" />
               </div>
               <div>
@@ -220,8 +220,8 @@ export default function StampCardPage() {
 
           {birthdayEnabled && (
             <>
-              <div className="flex items-start gap-2 rounded-xl bg-amber-500/5 p-3 text-xs text-muted-foreground">
-                <Cake className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-600" />
+              <div className="flex items-start gap-2 rounded-xl bg-amber-400/5 p-3 text-xs text-muted-foreground">
+                <Cake className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-300" />
                 <span>
                   Only customers who've added their birthday in their profile are included -- it's never asked for
                   at registration.
@@ -246,7 +246,7 @@ export default function StampCardPage() {
       <Card>
         <CardContent className="flex flex-col gap-4 p-4">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-secondary/10 text-secondary">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-secondary/20 text-secondary-foreground">
               <MessageCircle className="h-4 w-4" />
             </div>
             <div>
@@ -269,7 +269,7 @@ export default function StampCardPage() {
         <CardContent className="flex flex-col gap-4 p-4">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-400/10 text-amber-300">
                 <Hourglass className="h-4 w-4" />
               </div>
               <div>
@@ -299,8 +299,8 @@ export default function StampCardPage() {
                 </div>
               </div>
 
-              <div className="flex items-start gap-2 rounded-xl bg-amber-500/5 p-3 text-xs text-muted-foreground">
-                <MessageCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-600" />
+              <div className="flex items-start gap-2 rounded-xl bg-amber-400/5 p-3 text-xs text-muted-foreground">
+                <MessageCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-300" />
                 <span>
                   Once WhatsApp is connected, these messages send automatically -- reminders at 7, 3, and 1 day
                   before a card expires, and a notice if it does. Write them however you like.
@@ -342,28 +342,31 @@ export default function StampCardPage() {
         Save Reward Programs
       </Button>
 
+      <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Customer preview</p>
       <Card className="overflow-hidden">
-        <div className="bg-flow-gradient p-5 text-white">
+        <div className="bg-flow-hero p-5">
           <div className="mb-4 flex items-center gap-2">
             {business.logo_url ? (
               <img src={business.logo_url} alt={business.name} className="h-8 w-8 rounded-full object-cover" />
             ) : (
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-sm font-bold">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary/25 text-sm font-semibold text-foreground">
                 {business.name.charAt(0)}
               </div>
             )}
-            <p className="font-display font-bold">{business.name}</p>
+            <p className="font-display font-semibold text-foreground">{business.name}</p>
           </div>
-          <p className="font-display text-2xl font-bold">0 of {stampsRequired} Stamps</p>
+          <p className="font-display text-2xl font-semibold text-foreground">
+            <span className="text-primary">0</span> of {stampsRequired} Stamps
+          </p>
         </div>
         <CardContent className="p-4">
-          <div className="flex items-center gap-2 rounded-xl bg-muted/60 p-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-secondary/10 text-secondary">
+          <div className="flex items-center gap-2 rounded-lg bg-muted/60 p-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-primary">
               <Gift className="h-4 w-4" />
             </div>
             <div className="min-w-0">
-              <p className="text-[10px] font-bold uppercase tracking-wide text-secondary">{stampsRequired} stamps</p>
-              <p className="truncate text-sm font-medium">{rewardDescription || 'Set your reward description'}</p>
+              <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">{stampsRequired} stamps</p>
+              <p className="truncate text-sm font-medium text-foreground">{rewardDescription || 'Set your reward description'}</p>
             </div>
           </div>
         </CardContent>

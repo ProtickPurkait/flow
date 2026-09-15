@@ -51,21 +51,21 @@ export function ScratchWinCard({ businessSlug }: ScratchWinCardProps) {
         ref={resultRef}
         className={
           result.won
-            ? 'flex items-center gap-3 rounded-2xl border-2 border-success/30 bg-success/5 p-4'
-            : 'flex items-center gap-3 rounded-2xl border border-border bg-muted/50 p-4'
+            ? 'flex items-center gap-3 rounded-xl border border-primary/40 bg-primary/5 p-4'
+            : 'flex items-center gap-3 rounded-xl border border-border bg-muted/50 p-4'
         }
       >
         <div
           className={
             result.won
-              ? 'flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-success/15 text-success'
-              : 'flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-muted text-muted-foreground'
+              ? 'flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-primary'
+              : 'flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground'
           }
         >
           {result.won ? <PartyPopper className="h-5 w-5" /> : <Frown className="h-5 w-5" />}
         </div>
         <div className="min-w-0 flex-1">
-          <p className="font-semibold">{result.won ? `You won: ${result.prizeTitle}` : 'Better luck next time!'}</p>
+          <p className="font-semibold text-foreground">{result.won ? `You won: ${result.prizeTitle}` : 'Better luck next time!'}</p>
           <p className="text-xs text-muted-foreground">
             {result.won ? 'Show this screen to staff to claim your prize.' : 'Come back another day for another try.'}
           </p>
@@ -75,13 +75,13 @@ export function ScratchWinCard({ businessSlug }: ScratchWinCardProps) {
   }
 
   return (
-    <div className="flex items-center justify-between gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/5 p-4">
+    <div className="flex items-center justify-between gap-3 rounded-xl border border-primary/25 bg-primary/5 p-4">
       <div className="flex min-w-0 items-center gap-3">
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-amber-500/15 text-amber-600">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-primary">
           <Sparkles className="h-5 w-5" />
         </div>
         <div className="min-w-0">
-          <p className="font-semibold">Scratch &amp; Win</p>
+          <p className="font-semibold text-foreground">Scratch &amp; Win</p>
           <p className="text-xs text-muted-foreground">Try your luck for an instant prize</p>
         </div>
       </div>

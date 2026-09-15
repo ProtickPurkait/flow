@@ -38,7 +38,7 @@ export function StampGrid({ current, required }: Props) {
             className={cn(
               'flex aspect-square items-center justify-center rounded-full border-2 transition-colors',
               filled
-                ? 'border-transparent bg-flow-gradient text-white shadow-md shadow-primary/30'
+                ? 'border-transparent bg-flow-gradient text-primary-foreground shadow-sm'
                 : 'border-dashed border-border text-muted-foreground/40'
             )}
           >

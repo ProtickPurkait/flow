@@ -132,7 +132,7 @@ export default function MenuPage() {
       </Link>
 
       <div>
-        <h1 className="font-display text-xl font-bold">Digital Menu</h1>
+        <h1 className="text-xl font-semibold text-foreground">Digital Menu</h1>
         <p className="text-sm text-muted-foreground">Add categories, items, and photos one by one at your own pace.</p>
       </div>
 

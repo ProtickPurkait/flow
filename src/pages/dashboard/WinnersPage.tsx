@@ -89,7 +89,7 @@ export default function WinnersPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="font-display text-xl font-bold">Winners</h1>
+      <h1 className="text-xl font-semibold text-foreground">Winners</h1>
 
       <div className="flex gap-2">
         <button
@@ -97,12 +97,12 @@ export default function WinnersPage() {
           onClick={() => setTab('stamp')}
           className={cn(
             'flex flex-1 items-center justify-center gap-1.5 rounded-full px-4 py-2.5 text-sm font-semibold transition-colors',
-            tab === 'stamp' ? 'bg-flow-gradient text-white shadow-md' : 'bg-muted text-muted-foreground'
+            tab === 'stamp' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
           )}
         >
           <Gift className="h-4 w-4" />
           Stamp Cards
-          <span className={cn('rounded-full px-1.5 text-xs', tab === 'stamp' ? 'bg-white/25' : 'bg-card')}>
+          <span className={cn('rounded-full px-1.5 text-xs', tab === 'stamp' ? 'bg-primary-foreground/20' : 'bg-card')}>
             {pendingStamp.length}
           </span>
         </button>
@@ -111,12 +111,12 @@ export default function WinnersPage() {
           onClick={() => setTab('scratch')}
           className={cn(
             'flex flex-1 items-center justify-center gap-1.5 rounded-full px-4 py-2.5 text-sm font-semibold transition-colors',
-            tab === 'scratch' ? 'bg-flow-gradient text-white shadow-md' : 'bg-muted text-muted-foreground'
+            tab === 'scratch' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
           )}
         >
           <Sparkles className="h-4 w-4" />
           Scratch Cards
-          <span className={cn('rounded-full px-1.5 text-xs', tab === 'scratch' ? 'bg-white/25' : 'bg-card')}>
+          <span className={cn('rounded-full px-1.5 text-xs', tab === 'scratch' ? 'bg-primary-foreground/20' : 'bg-card')}>
             {pendingScratch.length}
           </span>
         </button>
@@ -146,7 +146,7 @@ export default function WinnersPage() {
       ) : tab === 'stamp' ? (
         <div className="flex flex-col gap-2">
           {stampPending.map((r) => (
-            <Card key={r.redemption_id} className="border-success/30">
+            <Card key={r.redemption_id} className="border-primary/30">
               <CardContent className="flex items-center justify-between gap-3 p-4">
                 <div className="min-w-0">
                   <p className="truncate font-semibold">{r.customer_name || r.customer_phone}</p>
@@ -176,7 +176,7 @@ export default function WinnersPage() {
       ) : (
         <div className="flex flex-col gap-2">
           {scratchPending.map((r) => (
-            <Card key={r.draw_id} className="border-success/30">
+            <Card key={r.draw_id} className="border-primary/30">
               <CardContent className="flex items-center justify-between gap-3 p-4">
                 <div className="min-w-0">
                   <p className="truncate font-semibold">{r.customer_name || r.customer_phone}</p>

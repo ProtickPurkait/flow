@@ -3,71 +3,50 @@
 @tailwind utilities;
 
 @layer base {
-  /* Fenlark Technologies brand blues: deep royal blue (the "F" mark) paired
-     with a brighter periwinkle blue (the mark's accent dot). Replaces the
-     earlier placeholder violet/magenta palette. */
+  /* Flow: premium restaurant-loyalty palette -- deep black-green ground,
+     emerald brand color, champagne gold as a rare accent, warm cream type.
+     Single dark theme by design (no light-mode variant) -- a black-and-gold
+     restaurant club has no convincing light equivalent. */
   :root {
-    --background: 222 45% 98%;
-    --foreground: 224 32% 12%;
+    /* Page ground -- #06110E */
+    --background: 164 45% 4%;
+    --foreground: 44 7% 94%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 224 32% 12%;
+    /* Card surface -- #0B1915 ("secondary background") */
+    --card: 163 39% 7%;
+    --card-foreground: 44 7% 94%;
 
-    --primary: 228 69% 55%;
-    --primary-foreground: 0 0% 100%;
-    --primary-strong: 228 72% 44%;
+    /* Champagne gold is the primary interactive color -- buttons, active
+       nav, selected chips, focus ring. Used deliberately, not as a fill
+       or border on every element. */
+    --primary: 44 70% 69%;
+    --primary-foreground: 164 45% 6%;
+    --primary-strong: 42 55% 52%;
 
-    --secondary: 226 94% 67%;
-    --secondary-foreground: 0 0% 100%;
+    /* Deep emerald accent -- secondary buttons/tiles, distinct from gold */
+    --secondary: 160 35% 28%;
+    --secondary-foreground: 44 7% 94%;
 
-    --accent: 221 83% 53%;
-    --accent-foreground: 0 0% 100%;
+    /* Warm highlight gold-orange -- subtle hover/emphasis fills */
+    --accent: 37 87% 65%;
+    --accent-foreground: 164 45% 6%;
 
-    --muted: 222 45% 95%;
-    --muted-foreground: 220 14% 47%;
+    /* Elevated surface -- #101F1B */
+    --muted: 164 32% 9%;
+    --muted-foreground: 137 4% 68%;
 
-    --border: 222 50% 91%;
-    --input: 222 50% 88%;
-    --ring: 228 69% 55%;
+    --border: 160 20% 18%;
+    /* Most-elevated surface -- #14251F -- form input fills */
+    --input: 159 30% 11%;
+    --ring: 44 70% 69%;
 
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 0 100% 68%;
+    --destructive-foreground: 0 0% 8%;
 
-    --success: 152 60% 40%;
-    --success-foreground: 0 0% 100%;
+    --success: 150 45% 45%;
+    --success-foreground: 164 45% 6%;
 
-    --radius: 0.75rem;
-  }
-
-  .dark {
-    --background: 225 35% 7%;
-    --foreground: 222 40% 96%;
-
-    --card: 225 30% 11%;
-    --card-foreground: 222 40% 96%;
-
-    --primary: 228 78% 66%;
-    --primary-foreground: 225 35% 7%;
-    --primary-strong: 228 75% 52%;
-
-    --secondary: 226 92% 72%;
-    --secondary-foreground: 225 35% 7%;
-
-    --accent: 221 85% 65%;
-    --accent-foreground: 225 35% 7%;
-
-    --muted: 225 22% 16%;
-    --muted-foreground: 222 15% 65%;
-
-    --border: 225 22% 20%;
-    --input: 225 22% 20%;
-    --ring: 228 78% 66%;
-
-    --destructive: 0 72% 55%;
-    --destructive-foreground: 0 0% 100%;
-
-    --success: 152 55% 46%;
-    --success-foreground: 225 35% 7%;
+    --radius: 1.25rem;
   }
 
   * {
@@ -96,7 +75,7 @@
   }
 
   .text-gradient {
-    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--secondary)));
+    background: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--primary)));
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;

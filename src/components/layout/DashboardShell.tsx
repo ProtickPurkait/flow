@@ -19,19 +19,19 @@ export function DashboardShell() {
   return (
     <div className="min-h-screen bg-background pb-20">
       <div className="mx-auto max-w-lg">
-        <header className="rounded-b-3xl bg-flow-gradient px-5 pb-5 pt-6 text-white">
+        <header className="rounded-b-xl bg-flow-hero px-5 pb-5 pt-6 text-foreground">
           {loading ? (
             <div className="flex h-14 items-center justify-center">
-              <Loader2 className="h-5 w-5 animate-spin" />
+              <Loader2 className="h-5 w-5 animate-spin text-primary" />
             </div>
           ) : !business ? (
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-display text-lg font-bold">
+                <p className="font-display text-lg font-semibold">
                   {isSuperAdmin ? "You're signed in as a Fenlark admin" : 'No business linked'}
                 </p>
                 {isSuperAdmin && (
-                  <NavLink to="/admin" className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold underline underline-offset-2">
+                  <NavLink to="/admin" className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-primary underline underline-offset-2">
                     <ShieldCheck className="h-3.5 w-3.5" />
                     Open Fenlark Admin
                   </NavLink>
@@ -41,17 +41,17 @@ export function DashboardShell() {
           ) : (
             <div className="flex items-center justify-between gap-3">
               <div className="flex min-w-0 items-center gap-3">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-white/15">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-md bg-secondary/25">
                   {business.logo_url ? (
                     <img src={business.logo_url} alt={business.name} className="h-full w-full object-cover" />
                   ) : (
-                    <span className="font-display text-lg font-bold">{business.name.charAt(0)}</span>
+                    <span className="font-display text-lg font-semibold">{business.name.charAt(0)}</span>
                   )}
                 </div>
                 <div className="min-w-0">
-                  <p className="truncate font-display text-lg font-bold leading-tight">{business.name}</p>
+                  <p className="truncate font-display text-lg font-semibold leading-tight">{business.name}</p>
                   {business.is_verified && (
-                    <span className="mt-0.5 inline-flex items-center gap-1 rounded-full bg-white/15 px-2 py-0.5 text-[11px] font-semibold">
+                    <span className="mt-0.5 inline-flex items-center gap-1 rounded-full bg-primary/15 px-2 py-0.5 text-[11px] font-semibold text-primary">
                       <BadgeCheck className="h-3 w-3" />
                       Verified
                     </span>
@@ -61,7 +61,7 @@ export function DashboardShell() {
               <NavLink
                 to="/dashboard/settings"
                 aria-label="Profile & Settings"
-                className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-white/15 transition-colors hover:bg-white/25"
+                className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-secondary/20 transition-colors hover:bg-secondary/30"
               >
                 <UserIcon className="h-5 w-5" />
               </NavLink>
@@ -70,7 +70,7 @@ export function DashboardShell() {
         </header>
 
         {business && business.status === 'paused' && (
-          <div className="mx-4 -mt-3 flex items-start gap-2 rounded-2xl border border-amber-500/25 bg-amber-500/10 p-3.5 text-xs text-amber-700 shadow-sm">
+          <div className="mx-4 -mt-3 flex items-start gap-2 rounded-lg border border-amber-400/25 bg-amber-400/10 p-3.5 text-xs text-amber-300 shadow-sm">
             <Clock className="mt-0.5 h-3.5 w-3.5 shrink-0" />
             <span>
               <strong className="font-semibold">Pending review.</strong> Set everything up now -- your customer page
